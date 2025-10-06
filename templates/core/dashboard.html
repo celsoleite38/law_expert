@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Dashboard</h2>
+    
+    <div class="row">
+        <!-- Widget Processos -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Meus Processos</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        {% for processo in processos %}
+                        <li>{{ processo.numero }} - {{ processo.cliente.nome }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Widget Próximas Audiências -->
+        <div class="col-md-6">
+            <div class="card">
+                
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Próximos Compromissos
+                    <a href="{% url 'agenda:lista_audiencias' %}" class="btn btn-sm btn-outline-primary">
+                            Ver Todos compromissos
+                        </a>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        {% for compromisso in compromissos %}
+                            <li>
+                            {{ compromisso.data_hora|date:"d/m/Y H:i" }} - 
+                            {{ compromisso.tipo }} - 
+                            {% if compromisso.processo %}
+                                 {{ compromisso.processo.cliente.nome }}
+                            {% else %}
+                                 {{ compromisso.cliente.nome }}
+                            {% endif %}
+                            </li>
+                        {% empty %}
+                            <li>Nenhum compromisso agendado.</li>
+                        {% endfor %}
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- O título agora usa o nome do tipo de evento dinamicamente -->
+  <h3 class="mb-4">🕘 Detalhes do Compromisso: {{ audiencia.get_tipo_display }}</h3>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      
+      <!-- ================================================== -->
+      <!-- INÍCIO DA LÓGICA DE EXIBIÇÃO CORRIGIDA -->
+      <!-- ================================================== -->
+
+      {% if audiencia.processo %}
+        <!-- CASO 1: O compromisso está ligado a um PROCESSO -->
+        <div class="mb-3">
+          <strong class="d-block text-muted">Processo Vinculado</strong>
+          <a href="{% url 'processos:detalhe_processo' audiencia.processo.pk %}">{{ audiencia.processo.numero }}</a>
+        </div>
+        <div class="mb-3">
+          <strong class="d-block text-muted">Cliente do Processo</strong>
+          <span>{{ audiencia.processo.cliente.nome }}</span>
+        </div>
+
+      {% elif audiencia.cliente %}
+        <!-- CASO 2: O compromisso está ligado diretamente a um CLIENTE -->
+        <div class="mb-3">
+          <strong class="d-block text-muted">Processo Vinculado</strong>
+          <span>Nenhum processo vinculado. </span>
+        </div>
+        <div class="mb-3">
+          <strong class="d-block text-muted">Cliente</strong>
+          <a href="{% url 'clientes:detalhe' audiencia.cliente.pk %}">{{ audiencia.cliente.nome }}</a>
+        </div>
+        
+      {% else %}
+        <!-- CASO DE ERRO: Não deveria acontecer com a validação que criamos -->
+        <div class="alert alert-danger">
+          <p>Erro: Este compromisso não está vinculado a um processo nem a um cliente.</p>
+        </div>
+      {% endif %}
+
+      <!-- ================================================== -->
+      <!-- FIM DA LÓGICA DE EXIBIÇÃO CORRIGIDA -->
+      <!-- ================================================== -->
+
+      <hr> <!-- Adiciona uma linha divisória para separar as informações -->
+
+      <!-- Detalhes que pertencem ao próprio compromisso -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <strong class="d-block text-muted">Data e Hora</strong>
+          <span>{{ audiencia.data_hora|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong class="d-block text-muted">Local</strong>
+          <span>{{ audiencia.local }}</span>
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong class="d-block text-muted">Vara / Fórum</strong>
+          <span>{{ audiencia.vara|default:"Não informado" }}</span>
+        </div>
+      </div>
+
+      {% if audiencia.resultado %}
+        <div class="alert alert-secondary mt-3">
+          <strong>Resultado:</strong>  
+
+          {{ audiencia.resultado|linebreaks }}
+        </div>
+      {% endif %}
+
+      <!-- Botões de Ação -->
+      <div class="mt-4">
+        {% if request.user.tipo_usuario == 'ADV' or 'editar_evento' in request.user.colaborador_vinculado.permissoes %}
+          <a href="{% url 'agenda:editar_audiencia' audiencia.id %}" class="btn btn-primary">
+            ✏️ Editar Compromisso
+          </a>
+        {% endif %}
+        <a href="{% url 'agenda:agenda' %}" class="btn btn-secondary">Voltar à Agenda</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

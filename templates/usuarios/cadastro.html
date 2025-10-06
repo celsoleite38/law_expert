@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">{{ view.object.pk|yesno:"Editar Usuário,Criar Novo Usuário" }}</h2>
+{% if form.errors %}
+<div class="alert alert-danger">
+  <strong>Erros no cadastro encontrados:</strong>
+  <ul class="mb-0">
+    {% for field in form %}
+      {% for error in field.errors %}
+        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+      {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_username" class="form-label">Usuário</label>
+                {{ form.username|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_email" class="form-label">Email</label>
+                {{ form.email|add_class:"form-control" }}
+            </div>
+
+            <!--<div class="col-md-6 mb-3">
+                <label for="id_first_name" class="form-label">Nome</label>
+                {{ form.first_name|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_last_name" class="form-label">Sobrenome</label>
+                {{ form.last_name|add_class:"form-control" }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_telefone" class="form-label">Telefone</label>
+                {{ form.telefone|add_class:"form-control" }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_tipo_usuario" class="form-label">Tipo de Usuário</label>
+                {{ form.tipo_usuario|add_class:"form-select" }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_oab" class="form-label">OAB (opcional)</label>
+                {{ form.oab|add_class:"form-control" }}
+            </div>-->
+
+            {% if not view.object.pk %}
+                <div class="col-md-6 mb-3">
+                    <label for="id_password1" class="form-label">Senha</label>
+                    {{ form.password1|add_class:"form-control" }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_password2" class="form-label">Confirme a Senha</label>
+                    {{ form.password2|add_class:"form-control" }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm" style="border: 2px solid #00007d;">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #00007d, #4a6fa5);">
+                    <h4 class="mb-0 text-center">Reenviar Email de Ativação</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mensagens -->
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <p class="mb-3">Digite seu email para reenviarmos o link de ativação:</p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required
+                                   placeholder="seu@email.com"
+                                   style="border: 2px solid #dee2e6; border-radius: 5px;">
+                        </div>
+                        <button type="submit" class="btn w-100 mb-3" 
+                                style="background: linear-gradient(135deg, #00007d, #4a6fa5); color: white;">
+                            🔄 Reenviar Email de Ativação
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <a href="{% url 'usuarios:login' %}" class="text-decoration-none">
+                            ← Voltar para o Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #00007d !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 125, 0.25) !important;
+}
+</style>
+{% endblock %}

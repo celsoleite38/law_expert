@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h4 class="mb-4">🔐 Permissões para {{ colaborador.nome }}</h4>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="row">
+
+      <!-- 👥 Clientes -->
+      <div class="col-md-6 mb-4">
+        <h5 class="mb-3">👥 Clientes</h5>
+        <div class="form-check mb-2">
+          {{ form.listar_clientes }} <label class="form-check-label" for="{{ form.listar_clientes.id_for_label }}">{{ form.listar_clientes.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.visualizar_cliente }} <label class="form-check-label" for="{{ form.visualizar_cliente.id_for_label }}">{{ form.visualizar_cliente.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.cadastrar_cliente }} <label class="form-check-label" for="{{ form.cadastrar_cliente.id_for_label }}">{{ form.cadastrar_cliente.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.editar_cliente }} <label class="form-check-label" for="{{ form.editar_cliente.id_for_label }}">{{ form.editar_cliente.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.excluir_cliente }} <label class="form-check-label" for="{{ form.excluir_cliente.id_for_label }}">{{ form.excluir_cliente.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.exportar_clientes }} <label class="form-check-label" for="{{ form.exportar_clientes.id_for_label }}">{{ form.exportar_clientes.label }}</label>
+        </div>
+      </div>
+
+      <!-- 📅 Agenda -->
+      <div class="col-md-6 mb-4">
+        <h5 class="mb-3">📆 Agenda e Audiências</h5>
+        <div class="form-check mb-2">
+          {{ form.ver_agenda }} <label class="form-check-label" for="{{ form.ver_agenda.id_for_label }}">{{ form.ver_agenda.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.adicionar_evento }} <label class="form-check-label" for="{{ form.adicionar_evento.id_for_label }}">{{ form.adicionar_evento.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.editar_evento }} <label class="form-check-label" for="{{ form.editar_evento.id_for_label }}">{{ form.editar_evento.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.excluir_evento }} <label class="form-check-label" for="{{ form.excluir_evento.id_for_label }}">{{ form.excluir_evento.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.compartilhar_agenda }} <label class="form-check-label" for="{{ form.compartilhar_agenda.id_for_label }}">{{ form.compartilhar_agenda.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.editar_audiencias }} <label class="form-check-label" for="{{ form.editar_audiencias.id_for_label }}">{{ form.editar_audiencias.label }}</label>
+        </div>
+      </div>
+
+      <!-- ⚖️ Processos -->
+      <div class="col-md-6 mb-4">
+        <h5 class="mb-3">⚖️ Processos</h5>
+        <div class="form-check mb-2">
+          {{ form.listar_processos }} <label class="form-check-label" for="{{ form.listar_processos.id_for_label }}">{{ form.listar_processos.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.visualizar_processo }} <label class="form-check-label" for="{{ form.visualizar_processo.id_for_label }}">{{ form.visualizar_processo.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.cadastrar_processo }} <label class="form-check-label" for="{{ form.cadastrar_processo.id_for_label }}">{{ form.cadastrar_processo.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.editar_processo }} <label class="form-check-label" for="{{ form.editar_processo.id_for_label }}">{{ form.editar_processo.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.excluir_processo }} <label class="form-check-label" for="{{ form.excluir_processo.id_for_label }}">{{ form.excluir_processo.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.atualizar_status_processo }} <label class="form-check-label" for="{{ form.atualizar_status_processo.id_for_label }}">{{ form.atualizar_status_processo.label }}</label>
+        </div>
+      </div>
+
+      <!-- 📦 Documentos -->
+      <div class="col-md-6 mb-4">
+        <h5 class="mb-3">📦 Documentos</h5>
+        <div class="form-check mb-2">
+          {{ form.acessar_documentos }} <label class="form-check-label" for="{{ form.acessar_documentos.id_for_label }}">{{ form.acessar_documentos.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.upload_documento }} <label class="form-check-label" for="{{ form.upload_documento.id_for_label }}">{{ form.upload_documento.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.download_documento }} <label class="form-check-label" for="{{ form.download_documento.id_for_label }}">{{ form.download_documento.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.excluir_documento }} <label class="form-check-label" for="{{ form.excluir_documento.id_for_label }}">{{ form.excluir_documento.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.visualizar_documentos }} <label class="form-check-label" for="{{ form.visualizar_documentos.id_for_label }}">{{ form.visualizar_documentos.label }}</label>
+        </div>
+      </div>
+
+      <!-- ⚙️ Sistema -->
+      <div class="col-md-6 mb-4">
+        <h5 class="mb-3">⚙️ Sistema</h5>
+        <div class="form-check mb-2">
+          {{ form.gerenciar_colaboradores }} <label class="form-check-label" for="{{ form.gerenciar_colaboradores.id_for_label }}">{{ form.gerenciar_colaboradores.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.configurar_layout }} <label class="form-check-label" for="{{ form.configurar_layout.id_for_label }}">{{ form.configurar_layout.label }}</label>
+        </div>
+        <div class="form-check mb-2">
+          {{ form.visualizar_relatorios }} <label class="form-check-label" for="{{ form.visualizar_relatorios.id_for_label }}">{{ form.visualizar_relatorios.label }}</label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Salvar Permissões</button>
+      <a href="{% url 'usuarios:colaborador' %}" class="btn btn-outline-secondary">Voltar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

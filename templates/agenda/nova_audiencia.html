@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+<style>
+  .tipo-select option[value="forum"] {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+  }
+  .tipo-select option[value="virtual"] {
+    background-color: #f8f9fa;
+    color: #198754;
+  }
+  .tipo-select option[value="atendimento"] {
+    background-color: #f8f9fa;
+    color: #ffc107;
+  }
+  .tipo-select option[value="sessao"] {
+    background-color: #f8f9fa;
+    color: #6f42c1;
+  }
+</style>
+
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i> Nova Audiência-Conciliação-Reunião Estratégica-Sessão de Julgamento</h5>
+      <a href="{% url 'agenda:lista_audiencias' %}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i> Voltar para lista
+      </a>
+    </div>
+    
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Data e Hora</label>
+            {{ form.data_hora|add_class:"form-control" }}
+            {% for error in form.data_hora.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo</label>
+            {{ form.tipo|add_class:"form-select" }}
+            {% for error in form.tipo.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Local</label>
+            {{ form.local|add_class:"form-control" }}
+            {% for error in form.local.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="col-md-6">
+              <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Vara</label>
+              {{ form.vara|add_class:"form-control" }}
+              {% for error in form.local.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-folder-open me-1"></i> Processo</label>
+            {{ form.processo|add_class:"form-select" }}
+            {% for error in form.processo.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-user me-1"></i> Cliente</label>
+            {{ form.cliente|add_class:"form-select" }}
+            {% for error in form.cliente.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-success px-4">
+            <i class="fas fa-save me-1"></i> Salvar Evento
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% block extra_js %}
+    <!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    flatpickr('input[name="data_hora"]', {
+      enableTime: true,
+      dateFormat: "d/m/Y H:i",
+      time_24hr: true,
+      locale: "pt"
+    });
+  });
+
+  // Lógica para desabilitar um campo quando o outro é preenchido
+  document.addEventListener('DOMContentLoaded', function () {
+    const processoSelect = document.querySelector('select[name="processo"]');
+    const clienteSelect = document.querySelector('select[name="cliente"]');
+
+    processoSelect.addEventListener('change', function () {
+      // Se um processo for selecionado, desabilita e limpa o campo cliente
+      if (processoSelect.value) {
+        clienteSelect.value = ''; // Limpa a seleção
+        clienteSelect.disabled = true;
+      } else {
+        clienteSelect.disabled = false;
+      }
+    });
+
+    clienteSelect.addEventListener('change', function () {
+      // Se um cliente for selecionado, desabilita e limpa o campo processo
+      if (clienteSelect.value) {
+        processoSelect.value = ''; // Limpa a seleção
+        processoSelect.disabled = true;
+      } else {
+        processoSelect.disabled = false;
+      }
+    });
+  });
+</script>
+
+
+    {% endblock %}
+{% endblock %}

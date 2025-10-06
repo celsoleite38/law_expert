@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advogados System - Login</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Customizado -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container-fluid {
+            height: 100vh;
+        }
+        
+        .sidebar {
+            background-color: var(--primary-color);
+            height: 100vh;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            min-height: 450px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            font-size: 16px;
+            height: 50px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            .mobile-menu-btn {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Botão do menu mobile -->
+    <button class="mobile-menu-btn d-md-none" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="container-fluid p-0 h-100">
+        <div class="row g-0 h-100">
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="text-center">
+                    <h4>
+                        <i class="fas fa-balance-scale"></i><br>
+                        ADVOGA<br>
+                        MINAS
+                    </h4>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="login-container">
+                    <div class="card shadow-lg">
+                        <div class="card-header">
+                            <h3 class="mb-0">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'usuarios:login' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="id_username" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Usuário
+                                    </label>
+                                    <input type="text" name="username" id="id_username" class="form-control" required placeholder="Digite seu usuário">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="id_password" class="form-label">
+                                        <i class="fas fa-lock me-1"></i>Senha
+                                    </label>
+                                    <input type="password" name="password" id="id_password" class="form-control" required placeholder="Digite sua senha">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 mb-3">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                                </button>
+                                <input type="hidden" name="next" value="{{ next|default:'/core/dashboard/' }}">
+                            </form>
+                            
+                            <div class="text-center">
+                                <a href="{% url 'usuarios:cadastro' %}" class="text-decoration-none">
+                                    <i class="fas fa-user-plus me-1"></i>Criar Novo Usuário
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS e Dependências -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script para menu mobile -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+        
+        // Fechar sidebar ao clicar fora (mobile)
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+        
+        // Ajustar layout ao redimensionar janela
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
+

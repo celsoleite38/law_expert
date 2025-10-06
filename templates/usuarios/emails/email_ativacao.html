@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ativação de Conta - Law Expert</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f4f4; 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #ffffff; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            margin-top: 20px; 
+        }
+        .header { 
+            text-align: center; 
+            background: linear-gradient(135deg, #4a6fa5, #99b6e2ff); 
+            color: #ffffff; 
+            padding: 30px 20px; 
+            border-radius: 10px 10px 10px 10px; 
+            margin: -20px -20px 20px -20px; 
+        }
+        .logo { 
+            max-width: 120px; 
+            height: auto; 
+            margin-bottom: 5px;
+        }
+        .button { 
+            background: linear-gradient(135deg, #4a6fa5, #99b6e2ff); 
+            color: #4c00ffff; 
+            padding: 12px 30px; 
+            text-decoration: none; 
+            border-radius: 25px; 
+            display: inline-block; 
+            font-weight: bold; 
+            text-align: center;
+            margin: 20px 0; 
+            border: none;
+            cursor: pointer;
+        }
+        .footer { 
+            margin-top: 30px; 
+            font-size: 12px; 
+            color: #777; 
+            text-align: center; 
+            border-top: 1px solid #eee; 
+            padding-top: 20px; 
+        }
+        .code { 
+            background-color: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 5px; 
+            border-left: 4px solid #00007d; 
+            word-break: break-all; 
+            font-family: monospace; 
+            font-size: 12px;
+        }
+        .welcome-text { 
+            font-size: 18px; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        .info-box {
+            background-color: #f0f8ff;
+            border: 1px solid #00007d;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://law.innosoft.com.br/static/images/law_logo.png" alt="Law Innosoft" class="logo">
+            <h1>Law Expert</h1>
+            <p>Sistema de Gestão Jurídica</p>
+        </div>
+        
+        <div class="welcome-text">
+            <h2>Olá, <strong>{{ username }}</strong>! 👋</h2>
+            <p>Seja bem-vindo(a) ao Law Expert!</p>
+        </div>
+        
+        <p>Sua conta de advogado foi criada com sucesso e está quase pronta para uso.</p>
+        
+        <div class="info-box">
+            <p><strong>📋 Informações da sua conta:</strong></p>
+            <p>👤 Usuário: <strong>{{ username }}</strong></p>
+            <p>📧 Email: <strong>{{ email }}</strong></p>
+        </div>
+        
+        <p>Para ativar sua conta e começar a utilizar nosso sistema, clique no botão abaixo:</p>
+        
+        <div style="text-align: center;">
+            <a href="{{ link_ativacao }}" class="button" >✅ Ativar Minha Conta</a>
+        </div>
+        
+        <p>Se o botão acima não funcionar, copie e cole o link abaixo no seu navegador:</p>
+        
+        <div class="code">
+            {{ link_ativacao }}
+        </div>
+        
+        <p><strong>⚡ Importante:</strong> Este link de ativação expira em 7 dias.</p>
+        
+        <div class="footer">
+            <p>Se você não solicitou este cadastro, por favor ignore este email.</p>
+            <p>Atenciosamente,<br>
+            <strong>Equipe Innosoft</strong><br>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

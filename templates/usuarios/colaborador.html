@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Cadastrar Colaborador</h2>
+
+  
+
+  {% if form.errors %}
+    <div class="alert alert-danger">
+      <strong>Erros encontrados:</strong>
+      <ul class="mb-0">
+        {% for field in form %}
+          {% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="id_nome" class="form-label">Nome completo</label>
+        {{ form.nome|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_email" class="form-label">E-mail</label>
+        {{ form.email|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_telefone" class="form-label">Telefone</label>
+        {{ form.telefone|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_funcao" class="form-label">Função</label>
+        {{ form.funcao|add_class:"form-select" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_senha" class="form-label">Senha de acesso</label>
+        {{ form.senha|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cadastrar Colaborador</button>
+  </form>
+</div>
+
+<hr class="my-5">
+
+<h3 class="mb-3">Colaboradores cadastrados</h3>
+
+{% if colaboradores %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Nome</th>
+          <th>Função</th>
+          <th>Permissões</th>
+          
+          <th>Editar Colaborador</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in colaboradores %}
+          <tr>
+            <td>{{ c.nome }}</td>
+            <td>{{ c.get_funcao_display }}</td>
+            <td>
+              {% if c.id %}
+                <div class="d-flex align-items-center gap-2">
+                  <a href="{% url 'usuarios:gerenciar_permissoes' c.id %}" class="btn btn-sm btn-outline-primary">
+                    ⚙️ Permissões
+                  </a>
+                  
+                </div>
+              {% else %}
+                <span class="text-muted">Indisponível</span>
+              {% endif %}
+            </td>
+            <td>
+            {% if c.id %}
+              <a href="{% url 'usuarios:editar_colaborador' c.pk %}" class="btn btn-sm btn-outline-success">
+                ✏️ Editar
+              </a>
+            {% else %}
+              <span class="text-muted">Indisponível</span>
+            {% endif %}
+          </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">Nenhum colaborador cadastrado ainda.</p>
+{% endif %}
+{% endblock %}

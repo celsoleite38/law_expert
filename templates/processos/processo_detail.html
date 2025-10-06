@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Detalhes do Processo: {{ processo.numero }}</h2>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header">
+      <h4 class="mb-0">Informações do Processo</h4>
+    </div>
+    <div class="card-body">
+      <p><strong>Cliente:</strong> {{ processo.cliente.nome }}</p>
+      <p><strong>Advogado Responsável:</strong>
+        {{ processo.advogado_responsavel.perfilprofissional.nome_completo|default:processo.advogado_responsavel.username }}
+      </p>
+      <p><strong>Status:</strong> {{ processo.get_status_display }}</p>
+      <p><strong>Área de Atuação:</strong> {{ processo.get_area_direito_display|default:"-" }}</p>
+      <p><strong>Descrição:</strong> {{ processo.descricao|linebreaks }}</p>
+      <p><small class="text-muted">Cadastrado em: {{ processo.data_cadastro|date:"d/m/Y H:i" }}</small></p>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+      <a href="{% url 'processos:editar_processo' pk=processo.pk %}" class="btn btn-sm btn-primary me-2">Editar Processo</a>
+      {% if processo.status != 'ARQUIVADO' %}
+        <a href="{% url 'processos:arquivar_processo' pk=processo.pk %}" class="btn btn-sm btn-warning">Arquivar</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header">
+      <h4 class="mb-0">Andamentos</h4>
+    </div>
+    <div class="card-body">
+      {% if andamentos %}
+        <ul class="list-group mb-3">
+          {% for andamento in andamentos %}
+            <li class="list-group-item">
+              <strong>{{ andamento.get_tipo_display }}</strong> — {{ andamento.data|date:"d/m/Y" }}
+              <p class="mb-1">{{ andamento.descricao|linebreaks }}</p>
+              {% if andamento.arquivo %}
+                <p class="mb-0"><a href="{{ andamento.arquivo.url }}" target="_blank">📄 Ver Arquivo</a></p>
+              {% endif %}
+              <small class="text-muted">
+                Por: {{ andamento.usuario.username }} em {{ andamento.criado_em|date:"d/m/Y H:i" }}
+              </small>
+              {% if not forloop.last %}
+                  <hr class="my-3" style="border-top: 3px solid #000000ff;">
+              {% endif %}
+
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>Nenhum andamento registrado para este processo.</p>
+      {% endif %}
+
+      <h5 class="mt-4">Adicionar Novo Andamento</h5>
+      <form method="post" action="{% url 'processos:novo_andamento' processo.pk %}" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% for field in andamento_form %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% if field.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in field.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Adicionar Andamento</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <a href="{% url 'processos:lista_processos' %}" class="btn btn-secondary">Voltar para a Lista de Processos</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>{{ cliente.nome }}</h2>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <p><strong>Tipo:</strong> {{ cliente.get_tipo_display }}</p>
+        <p><strong>CPF/CNPJ:</strong> {{ cliente.cpf_cnpj }}</p>
+        <p><strong>Área de Direito:</strong> {{ cliente.get_area_direito_display }}</p>
+        <p><strong>LGPD:</strong>
+          {% if cliente.lgpd_consentimento %}
+            Consentimento registrado
+          {% else %}
+            Não consentiu
+          {% endif %}
+        </p>
+        <p><strong>Advogado Responsável:</strong>
+          {{ cliente.advogado_responsavel.perfilprofissional.nome_completo|default:cliente.advogado_responsavel.username }}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>E-mail:</strong> {{ cliente.email|default:"-" }}</p>
+        <p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+        <p><strong>Data de Cadastro:</strong> {{ cliente.data_cadastro|date:"d/m/Y" }}</p>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <h5>Endereço</h5>
+      <p>{{ cliente.endereco|default:"Não informado"|linebreaks }}</p>
+    </div>
+
+    <div class="mt-3">
+      <h5>Observações</h5>
+      <p>{{ cliente.observacoes|default:"Nenhuma observação cadastrada"|linebreaks }}</p>
+    </div>
+
+    <div class="mt-4">
+      <a href="{% url 'clientes:editar' cliente.pk %}" class="btn btn-primary">Editar</a>
+      <a href="{% url 'clientes:lista' %}" class="btn btn-secondary">Voltar</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

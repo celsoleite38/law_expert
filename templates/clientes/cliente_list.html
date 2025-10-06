@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- O bloco if/else de permissão foi completamente removido daqui -->
+
+<div class="container mt-4">
+  <h2 class="mb-4">Lista de Clientes</h2>
+
+  <div class="mb-3 d-flex justify-content-between align-items-center">
+    <a href="{% url 'clientes:novo' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> Novo Cliente
+    </a>
+    <form method="GET" class="d-flex">
+      <input class="form-control me-2" type="search" placeholder="Buscar por nome ou CPF/CNPJ" aria-label="Search" name="q" value="{{ request.GET.q|default:'' }}">
+      <button class="btn btn-outline-success" type="submit">Buscar</button>
+    </form>
+  </div>
+
+  <div class="row">
+    {% for cliente in clientes %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm" style="border: 2px solid #2c3e50;>
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ cliente.nome }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ cliente.get_tipo_display }}</h6>
+            <p class="card-text mb-1"><strong>CPF/CNPJ:</strong> {{ cliente.cpf_cnpj }}</p>
+            {% if cliente.email %}
+              <p class="card-text mb-1"><strong>Email:</strong> {{ cliente.email }}</p>
+            {% endif %}
+            {% if cliente.telefone %}
+              <p class="card-text mb-1"><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+            {% endif %}
+            {% if cliente.endereco %}
+              <p class="card-text mb-1"><strong>Endereço:</strong> {{ cliente.endereco }}</p>
+            {% endif %}
+            <p class="card-text mb-1"><strong>Área de Atuação:</strong> {{ cliente.get_area_direito_display|default:"-" }}</p>
+            <p class="card-text mb-3"><strong>Advogado:</strong> 
+              {{ cliente.advogado_responsavel.perfilprofissional.nome_completo|default:cliente.advogado_responsavel.username }}
+            </p>
+
+            <div class="mt-auto">
+              <a href="{% url 'clientes:detalhe' pk=cliente.pk %}" class="btn btn-sm"style="background-color:  #2c3e50; color: white; border: 1px solid #00007d;">Ver Detalhes</a>
+              <a href="{% url 'clientes:editar' pk=cliente.pk %}" class="btn btn-sm" style="background-color:  #6e5d0fff; color: white; border: 1px solid #00007d;">Editar</a>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <p>Nenhum cliente cadastrado.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}```
+
+

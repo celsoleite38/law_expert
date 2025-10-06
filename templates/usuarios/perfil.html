@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Perfil do Advogado{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4 text-center">Meu Perfil</h2>
+
+            <div class="card shadow rounded-4">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">Nome</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Sobrenome</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            {{ form.telefone }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="oab" class="form-label">Número da OAB</label>
+                            {{ form.oab }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Logo do Escritório</label><br>
+                            {% if form.instance.logo %}
+                                <img src="{{ form.instance.logo.url }}" class="img-thumbnail mb-2" style="max-height: 150px;" alt="Logo atual">
+                            {% endif %}
+                            {{ form.logo }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg rounded-3">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

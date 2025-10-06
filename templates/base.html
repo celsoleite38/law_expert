@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/law_logo.ico' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law Experts - {% block title %}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Customizado -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-color: #ecf0f1;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            background-color: var(--primary-color);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .sidebar .nav-link {
+            color: var(--light-color);
+            margin-bottom: 5px;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if request.user.notificacoes.all %}
+
+        <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle position-relative" href="#" id="notificacoesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    {% with request.user.notificacoes.all|dictsortreversed:"criada_em"|slice:":5" as ultimas %}
+                    {% if ultimas|length > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ ultimas|length }}
+                        </span>
+                    {% endif %}
+                    {% endwith %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificacoesDropdown" style="min-width: 300px;">
+                    {% for n in request.user.notificacoes.all|dictsortreversed:"criada_em"|slice:":5" %}
+                    <li class="dropdown-item {% if not n.lida %}fw-bold{% endif %}">
+                        {{ n.titulo }}<br><small>{{ n.criada_em|date:"d/m/Y H:i" }}</small>
+                    </li>
+                    {% empty %}
+                    <li class="dropdown-item text-muted">Sem notificações</li>
+                    {% endfor %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center" href="{% url 'notificacoes:painel' %}">Ver todas</a></li>
+                </ul>
+            </li>
+    {% endif %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-0"  style="background: linear-gradient(135deg, #34495e 0%, #4a6fa5 100%);">
+                <div class="p-3">
+                    <h4 class="text-center mb-4">
+                        {% load static %}
+
+                         <img src="{% static 'images/law_logo.png' %}" alt="Logo" style="width:160px; height:auto;"><br>
+                    </h4>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                               href="{% url 'dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Inicio
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'clientes' in request.resolver_match.namespace %}active{% endif %}" 
+                               href="{% url 'clientes:lista' %}">
+                                <i class="fas fa-users me-2"></i> Clientes
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'processos' in request.resolver_match.namespace %}active{% endif %}" 
+                               href="{% url 'processos:lista_processos' %}">
+                                <i class="fas fa-folder-open me-2"></i> Processos
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'agenda' in request.resolver_match.namespace %}active{% endif %}" 
+                               href="{% url 'agenda:agenda' %}">
+                                <i class="fas fa-calendar-alt me-2"></i> Agenda
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'financeiro' in request.resolver_match.namespace %}active{% endif %}" 
+                               href="{% url 'financeiro:lista_honorarios' %}">
+                                <i class="fas fa-dollar-sign me-2"></i> Financeiro
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="{% url 'notificacoes:painel' %}">
+                                <i class="fas fa-cog me-2"></i> Notificações
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                <!-- Top Bar -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded shadow-sm" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white;">
+                    <div class="container-fluid">
+                        <span class="navbar-brand">
+                            {% block page_title %}{% endblock %}
+                            <span style="font-weight: bold" class="navbar-brand">
+                                Bem vindo 
+                                <font color="ffffffff" size="5">
+                                    {% if request.user.tipo_usuario == 'ADV' %}
+                                        {{ request.user.perfilprofissional.nome_completo }}
+                                        | OAB {{ request.user.perfilprofissional.oab }}
+                                    {% elif request.user.tipo_usuario == 'COLAB' %}
+                                        {{ request.user.colaborador_vinculado.nome }}
+                                    {% else %}
+                                        {{ request.user.get_full_name|default:request.user.username }}
+                                    {% endif %}
+                                </font>
+
+                                <!--<font color="#00007d" size="5"> | OAB {{ request.user.perfilprofissional.oab }}</font>-->
+
+                            </span>
+                        </span>
+                        
+                        <div class="dropdown">
+                           <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if request.user.perfilprofissional.logotipo %}
+                                    <img src="{{ request.user.perfilprofissional.logotipo.url }}" alt="Logo" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user-circle me-2"></i>
+                                {% endif %}
+                                
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'usuarios:editar_advogado' %}">
+                                        <i class="fas fa-user-edit me-2"></i>Editar Perfil</a>
+                                        
+                                    </a>
+                                </li>
+                                {% if request.user.tipo_usuario == 'ADV' %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'usuarios:colaborador' %}">
+                                        <i class="fas fa-user-plus me-2"></i> Colaboradores
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'usuarios:logout' %}" method="post" style="margin: 0;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-start w-100" style="background: none; border: none;">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Sair
+                                        </button>
+                                    </form>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Mensagens -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Conteúdo Principal -->
+                <div class="container-fluid">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS e Dependências -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts Customizados -->
+    {% block scripts %}{% endblock %}
+    {% block extra_js %} {% endblock %}
+
+    
+</body>
+
+</html>

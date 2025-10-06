@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Editar Colaborador: {{ colaborador.nome }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <fieldset class="border p-3 mb-4">
+      <legend>🧾 Dados do colaborador</legend>
+      <div class="mb-3">
+        {{ form.nome.label_tag }}
+        {{ form.nome }}
+      </div>
+      <div class="mb-3">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+      </div>
+      <div class="mb-3">
+        {{ form.funcao.label_tag }}
+        {{ form.funcao }}
+      </div>
+      <div class="form-check mt-3">
+        {{ form.is_active }}
+        <bold>{{ form.is_active.label_tag }}</bold>
+      </div>
+    </fieldset>
+
+    <fieldset class="border p-3 mb-4">
+      <legend>🔐 Alterar senha (opcional)</legend>
+      {{ form_senha.nova_senha.label_tag }}
+      {{ form_senha.nova_senha }}
+    </fieldset>
+
+    <button type="submit" class="btn btn-success">Salvar alterações</button>
+    <a href="{% url 'usuarios:colaborador' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+{% endblock %}

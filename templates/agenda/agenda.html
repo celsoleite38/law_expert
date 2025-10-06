@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">📅 Agenda de Compromissos</h2>
+    <a href="{% url 'agenda:nova_audiencia' %}" class="btn btn-success">
+      <i class="fas fa-plus-circle me-1"></i> Novo Evento
+    </a>
+    <a href="{% url 'agenda:lista_audiencias' %}" class="btn btn-primary">
+        Ver Todos Eventos
+    </a>
+  </div>
+
+  <div id="calendar"></div>
+</div>
+
+{% endblock %}
+
+<!-- agenda/agenda.html (Substitua todo o bloco de script) -->
+
+<!-- agenda/agenda.html (Substitua todo o bloco de script) -->
+
+{% block scripts %}
+  <!-- FullCalendar CSS/JS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <!-- Bibliotecas para o Popup (Tippy.js ) -->
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function ( ) {
+      const calendarEl = document.getElementById('calendar');
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        editable: true,
+        navLinks: true,
+        dayMaxEvents: true,
+        timeZone: 'local',
+        events: '{% url "agenda:api_eventos" %}',
+
+        // FUNÇÃO CORRIGIDA PARA CRIAR O POPUP
+        eventDidMount: function (info) {
+          // Acessa os dados extras usando a sintaxe correta: info.event.extendedProps
+          const props = info.event.extendedProps;
+          
+          tippy(info.el, {
+            // Monta o conteúdo do popup com os dados corretos
+            content: `
+              <strong>Tipo:</strong> ${props.tipo_evento}  
+
+              <strong>Processo:</strong> ${props.processo_numero}  
+
+              <strong>Cliente:</strong> ${props.cliente_nome}  
+
+              <strong>Local:</strong> ${props.local}
+            `,
+            allowHTML: true,
+            placement: 'top',
+            animation: 'shift-away',
+            theme: 'light-border',
+          });
+        },
+
+        // As outras funções continuam iguais
+        eventClick: function (info) {
+          window.location.href = '/agenda/audiencias/' + info.event.id + '/';
+        },
+        eventDrop: function (info) {
+          const novaData = info.event.start.toISOString();
+          fetch(`/agenda/audiencias/${info.event.id}/reagendar/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ data_hora: novaData })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status !== 'success') {
+              alert('Erro ao reagendar.');
+              info.revert();
+            }
+          })
+          .catch(() => {
+            alert('Erro de conexão.');
+            info.revert();
+          });
+        },
+        dateClick: function (info) {
+          const urlNova = '{% url "agenda:nova_audiencia" %}?data=' + encodeURIComponent(info.dateStr);
+          window.location.href = urlNova;
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
+{% endblock %}
+
+
+

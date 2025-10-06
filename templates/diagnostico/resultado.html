@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Diagnóstico de Acesso Colaborativo</h2>
+
+  <p><strong>Usuário logado:</strong> {{ usuario_logado.username }}</p>
+  <p><strong>Advogado identificado via função:</strong> {{ advogado_identificado.username }}</p>
+
+  <hr>
+
+  <h4>Clientes vinculados ao advogado</h4>
+  {% if clientes %}
+    <ul>
+      {% for cliente in clientes %}
+        <li>{{ cliente.nome }} — {{ cliente.cpf_cnpj }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">Nenhum cliente vinculado.</p>
+  {% endif %}
+
+  <h4 class="mt-4">Processos vinculados ao advogado</h4>
+  {% if processos %}
+    <ul>
+      {% for processo in processos %}
+        <li>{{ processo.numero }} — {{ processo.cliente.nome }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">Nenhum processo vinculado.</p>
+  {% endif %}
+</div>
+{% endblock %}

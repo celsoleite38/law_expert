@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">📋 Audiências - Compromissos - Reuniões - Atendimentos </h3>
+    <a href="{% url 'agenda:nova_audiencia' %}" class="btn btn-primary">
+      <i class="fas fa-calendar-plus me-1"></i> Novo Evento
+    </a>
+  </div>
+
+  {% if object_list %}
+    <div class="table-responsive shadow-sm">
+      <table class="table table-striped align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">📅 Data</th>
+            <th scope="col">📝 Tipo</th>
+            <th scope="col">📂 Processo</th>
+            <th scope="col">📂 Cliente</th>
+            <th scope="col">📍 Local</th>
+            <th scope="col">🔧 Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for audiencia in object_list %}
+            <tr>
+              <td>{{ audiencia.data_hora|date:"d/m/Y H:i" }}</td>
+              <td>
+                {% if "virtual" in audiencia.tipo|lower %}
+                  <span class="badge bg-success">{{ audiencia.tipo }}</span>
+                {% elif "atendimento" in audiencia.tipo|lower %}
+                  <span class="badge bg-warning text-dark">{{ audiencia.tipo }}</span>
+                {% elif "sessão" in audiencia.tipo|lower %}
+                  <span class="badge bg-purple text-white">{{ audiencia.tipo }}</span>
+                {% else %}
+                  <span class="badge bg-primary">{{ audiencia.tipo }}</span>
+                {% endif %}
+              </td>
+              <td>{{ audiencia.processo.numero }}</td>
+              <td>{{ audiencia.processo.cliente.nome }} {{ audiencia.cliente.nome }}</td>
+               
+              <td>{{ audiencia.local }}</td>
+              <td>
+                <a href="{% url 'agenda:detalhe_audiencia' audiencia.id %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'agenda:editar_audiencia' audiencia.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'agenda:cancelar_audiencia' audiencia.id %}" class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Tem certeza que deseja cancelar esta audiência?');">
+                  <i class="fas fa-trash-alt"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-secondary text-center">
+      Nenhuma audiência agendada até o momento.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

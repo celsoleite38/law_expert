@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+  .tipo-select option[value="forum"] {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+  }
+  .tipo-select option[value="virtual"] {
+    background-color: #f8f9fa;
+    color: #198754;
+  }
+  .tipo-select option[value="atendimento"] {
+    background-color: #f8f9fa;
+    color: #ffc107;
+  }
+  .tipo-select option[value="sessao"] {
+    background-color: #f8f9fa;
+    color: #6f42c1;
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+      <h5 class="mb-0"><i class="fas fa-calendar-edit me-2"></i> Editar Audiência / Compromisso</h5>
+      <a href="{% url 'agenda:lista_audiencias' %}" class="btn btn-sm btn-light">
+        <i class="fas fa-arrow-left me-1"></i> Voltar para lista
+      </a>
+    </div>
+
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+    <div class="col-md-7"> <!-- Usamos a largura total para acomodar os dois -->
+    <label class="form-label"><i class="fas fa-folder-open me-1"></i> Processo e Cliente Associado</label>
+    
+    <div class="d-flex align-items-center"> <!-- Flexbox para alinhar lado a lado -->
+      
+      <!-- Parte 1: O campo de seleção do Processo -->
+      <div class="container mt-7"> <!-- Faz o select ocupar o espaço disponível -->
+        {{ form.processo }}
+      </div>
+
+      <!-- Parte 2: O nome do Cliente, que aparecerá ao lado -->
+      <div class="container mt-7"> <!-- 'ms-3' adiciona uma margem à esquerda para separar -->
+        <strong class="d-block text-muted">Cliente</strong> {{ audiencia.cliente.nome }}
+      </div>
+
+    </div>
+        
+
+            
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Data e Hora</label>
+            {{ form.data_hora }}
+            {% for error in form.data_hora.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo</label>
+            {{ form.tipo|add_class:"form-select tipo-select" }}
+            {% for error in form.tipo.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Local</label>
+            {{ form.local|add_class:"form-control" }}
+            {% for error in form.local.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label"><i class="fas fa-university me-1"></i> Vara / Fórum</label>
+            {{ form.vara|add_class:"form-control" }}
+            {% for error in form.vara.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          
+        </div>
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-success px-4">
+            <i class="fas fa-save me-1"></i> Salvar Alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
+{% endblock %}

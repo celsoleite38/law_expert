@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Editar Perfil Profissional</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {% if form.errors %}
+    <div class="alert alert-danger">
+      <strong>Corrija os seguintes erros:</strong>
+      <ul class="mb-0">
+        {% for field in form %}
+          {% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="id_nome_completo" class="form-label">Nome Completo</label>
+        {{ form.nome_completo|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_cpf" class="form-label">CPF</label>
+        {{ form.cpf|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_crefito" class="form-label">OAB</label>
+        {{ form.oab|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_endereco_escritorio" class="form-label">Endereço do Escritório</label>
+        {{ form.endereco_escritorio|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_telefone_escritorio" class="form-label">Telefone do Escritório</label>
+        {{ form.telefone_escritorio|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_celular" class="form-label">Celular / WhatsApp</label>
+        {{ form.celular|add_class:"form-control" }}
+      </div>
+
+
+      <div class="col-md-6 mb-3">
+        <label for="id_nomeclinica" class="form-label">Nome do Escritorio</label>
+        {{ form.nome_escritorio|add_class:"form-control" }}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_logotipo" class="form-label">Logotipo (opcional)</label>
+        {{ form.logotipo|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+  </form>
+</div>
+{% endblock %}
