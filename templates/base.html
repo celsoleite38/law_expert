@@ -24,21 +24,26 @@
         
         body {
             background-color: #f8f9fa;
+            overflow-x: hidden;
         }
         
         .sidebar {
-            background-color: var(--primary-color);
-            min-height: 100vh;
+            background: linear-gradient(135deg, #34495e 0%, #4a6fa5 100%);
             color: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
         
         .sidebar .nav-link {
             color: var(--light-color);
             margin-bottom: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
         }
         
         .sidebar .nav-link:hover {
             background-color: var(--secondary-color);
+            transform: translateX(5px);
         }
         
         .sidebar .nav-link.active {
@@ -48,6 +53,7 @@
         
         .main-content {
             padding: 20px;
+            transition: all 0.3s ease;
         }
         
         .card {
@@ -61,50 +67,225 @@
             color: white;
             border-radius: 10px 10px 0 0 !important;
         }
+        
+        /* Top Bar Responsiva */
+        .top-bar {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 5px 10px;
+        }
+        
+        .user-info-mobile {
+            display: none;
+        }
+        
+        /* Responsividade */
+        
+        /* Desktop (992px+) */
+        @media (min-width: 992px) {
+            .sidebar {
+                min-height: 100vh;
+                position: fixed;
+                width: 250px;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                width: calc(100% - 250px);
+            }
+            
+            .logo-image {
+                width: 160px;
+            }
+        }
+        
+        /* Tablet (768px - 991px) */
+        @media (max-width: 991px) and (min-width: 768px) {
+            .sidebar {
+                min-height: 100vh;
+                position: fixed;
+                width: 200px;
+            }
+            
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+            
+            .logo-image {
+                width: 140px;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+        }
+        
+        /* Mobile (767px ou menos) */
+        @media (max-width: 767px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 1050;
+            }
+            
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 70px 15px 15px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .logo-image {
+                width: 140px;
+            }
+            
+            .top-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1040;
+                margin-bottom: 0;
+                border-radius: 0;
+                padding: 10px 15px;
+            }
+            
+            .user-info-desktop {
+                display: none;
+            }
+            
+            .user-info-mobile {
+                display: block;
+                text-align: center;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            
+            .navbar-brand {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Mobile Pequeno (480px ou menos) */
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100%;
+            }
+            
+            .logo-image {
+                width: 120px;
+            }
+            
+            .main-content {
+                padding: 60px 10px 10px;
+            }
+            
+            .nav-link {
+                font-size: 0.85rem;
+                padding: 6px 10px;
+            }
+        }
+        
+        /* Overlay para mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1045;
+            display: none;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        /* Notificações responsivas */
+        .notification-badge {
+            font-size: 0.7rem;
+        }
+        
+        @media (max-width: 767px) {
+            .dropdown-menu {
+                position: fixed !important;
+                top: 60px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 90% !important;
+                max-width: 300px !important;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% if request.user.notificacoes.all %}
+    <!-- Overlay para mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle position-relative" href="#" id="notificacoesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-bell"></i>
-                    {% with request.user.notificacoes.all|dictsortreversed:"criada_em"|slice:":5" as ultimas %}
-                    {% if ultimas|length > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{ ultimas|length }}
-                        </span>
-                    {% endif %}
-                    {% endwith %}
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificacoesDropdown" style="min-width: 300px;">
-                    {% for n in request.user.notificacoes.all|dictsortreversed:"criada_em"|slice:":5" %}
-                    <li class="dropdown-item {% if not n.lida %}fw-bold{% endif %}">
-                        {{ n.titulo }}<br><small>{{ n.criada_em|date:"d/m/Y H:i" }}</small>
-                    </li>
-                    {% empty %}
-                    <li class="dropdown-item text-muted">Sem notificações</li>
-                    {% endfor %}
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center" href="{% url 'notificacoes:painel' %}">Ver todas</a></li>
-                </ul>
-            </li>
-    {% endif %}
-
-    <div class="container-fluid">
-        <div class="row">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
             <!-- Sidebar -->
-            <div class="col-md-2 sidebar p-0"  style="background: linear-gradient(135deg, #34495e 0%, #4a6fa5 100%);">
+            <div class="sidebar p-0" id="sidebar">
                 <div class="p-3">
-                    <h4 class="text-center mb-4">
-                        {% load static %}
-
-                         <img src="{% static 'images/law_logo.png' %}" alt="Logo" style="width:160px; height:auto;"><br>
+                    <!-- Botão fechar para mobile -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 d-md-none">
+                        <h5 class="mb-0">Menu</h5>
+                        <button class="btn btn-sm btn-light" onclick="toggleSidebar()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <h4 class="text-center mb-4 d-none d-md-block">
+                        <img src="{% static 'images/law_logo.png' %}" alt="Logo" class="logo-image"><br>
                     </h4>
                     
-                    <ul class="nav flex-column">
+                    <h5 class="text-center mb-4 d-md-none">
+                        <img src="{% static 'images/law_logo.png' %}" alt="Logo" class="logo-image"><br>
+                    </h5>
+                    
+                    <!-- Informações do usuário para mobile -->
+                    <div class="user-info-mobile d-md-none">
+                        <small>
+                            {% if request.user.tipo_usuario == 'ADV' %}
+                                {{ request.user.perfilprofissional.nome_completo }}
+                                | OAB {{ request.user.perfilprofissional.oab }}
+                            {% elif request.user.tipo_usuario == 'COLAB' %}
+                                {{ request.user.colaborador_vinculado.nome }}
+                            {% else %}
+                                {{ request.user.get_full_name|default:request.user.username }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    
+                    <ul class="nav flex-column mt-3">
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
                                href="{% url 'dashboard' %}">
@@ -149,17 +330,22 @@
                 </div>
             </div>
             
-            
             <!-- Main Content -->
-            <div class="col-md-10 main-content">
+            <div class="main-content">
                 <!-- Top Bar -->
-                <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded shadow-sm" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white;">
+                <nav class="navbar top-bar navbar-expand-lg rounded shadow-sm">
                     <div class="container-fluid">
+                        <!-- Botão menu mobile -->
+                        <button class="mobile-menu-btn me-3" id="mobileMenuBtn" onclick="toggleSidebar()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        
                         <span class="navbar-brand">
                             {% block page_title %}{% endblock %}
-                            <span style="font-weight: bold" class="navbar-brand">
-                                Bem vindo 
+                            <span class="user-info-desktop">
+                                <strong>Bem vindo</strong>
                                 <font color="ffffffff" size="5">
+                                <strong>
                                     {% if request.user.tipo_usuario == 'ADV' %}
                                         {{ request.user.perfilprofissional.nome_completo }}
                                         | OAB {{ request.user.perfilprofissional.oab }}
@@ -168,48 +354,72 @@
                                     {% else %}
                                         {{ request.user.get_full_name|default:request.user.username }}
                                     {% endif %}
-                                </font>
-
-                                <!--<font color="#00007d" size="5"> | OAB {{ request.user.perfilprofissional.oab }}</font>-->
-
+                                </strong></span></font>
                             </span>
                         </span>
                         
-                        <div class="dropdown">
-                           <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% if request.user.perfilprofissional.logotipo %}
-                                    <img src="{{ request.user.perfilprofissional.logotipo.url }}" alt="Logo" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
-                                {% else %}
-                                    <i class="fas fa-user-circle me-2"></i>
-                                {% endif %}
-                                
-                            </button>
+                        <div class="d-flex align-items-center">
+                            <!-- Notificações -->
+                            {% if request.user.notificacoes.all %}
+                            <div class="dropdown me-3">
+                                <a class="nav-link dropdown-toggle position-relative" href="#" id="notificacoesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-bell"></i>
+                                    {% with request.user.notificacoes.all|dictsortreversed:"criada_em"|slice:":5" as ultimas %}
+                                    {% if ultimas|length > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                                        {{ ultimas|length }}
+                                        </span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificacoesDropdown">
+                                    {% for n in request.user.notificacoes.all|dictsortreversed:"criada_em"|slice:":5" %}
+                                    <li class="dropdown-item {% if not n.lida %}fw-bold{% endif %}">
+                                        {{ n.titulo }}<br><small>{{ n.criada_em|date:"d/m/Y H:i" }}</small>
+                                    </li>
+                                    {% empty %}
+                                    <li class="dropdown-item text-muted">Sem notificações</li>
+                                    {% endfor %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-center" href="{% url 'notificacoes:painel' %}">Ver todas</a></li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Menu do Usuário -->
+                            <div class="dropdown">
+                                <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% if request.user.perfilprofissional.logotipo %}
+                                        <img src="{{ request.user.perfilprofissional.logotipo.url }}" alt="Logo" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                    {% else %}
+                                        <i class="fas fa-user-circle me-2"></i>
+                                    {% endif %}
+                                </button>
 
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'usuarios:editar_advogado' %}">
-                                        <i class="fas fa-user-edit me-2"></i>Editar Perfil</a>
-                                        
-                                    </a>
-                                </li>
-                                {% if request.user.tipo_usuario == 'ADV' %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'usuarios:colaborador' %}">
-                                        <i class="fas fa-user-plus me-2"></i> Colaboradores
-                                    </a>
-                                </li>
-                                {% endif %}
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{% url 'usuarios:logout' %}" method="post" style="margin: 0;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item text-start w-100" style="background: none; border: none;">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Sair
-                                        </button>
-                                    </form>
-                                </li>
-
-                            </ul>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'usuarios:editar_advogado' %}">
+                                            <i class="fas fa-user-edit me-2"></i>Editar Perfil
+                                        </a>
+                                    </li>
+                                    {% if request.user.tipo_usuario == 'ADV' %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'usuarios:colaborador' %}">
+                                            <i class="fas fa-user-plus me-2"></i> Colaboradores
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{% url 'usuarios:logout' %}" method="post" style="margin: 0;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item text-start w-100" style="background: none; border: none;">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Sair
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </nav>
@@ -225,7 +435,7 @@
                 {% endif %}
                 
                 <!-- Conteúdo Principal -->
-                <div class="container-fluid">
+                <div class="container-fluid p-0">
                     {% block content %}{% endblock %}
                 </div>
             </div>
@@ -235,11 +445,60 @@
     <!-- Bootstrap JS e Dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Script para menu responsivo -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+            
+            // Previne scroll do body quando sidebar está aberta
+            if (sidebar.classList.contains('show')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Fechar sidebar ao clicar no overlay
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (window.innerWidth <= 767) {
+                if (overlay.contains(event.target) && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    toggleSidebar();
+                }
+            }
+        });
+        
+        // Ajustar layout ao redimensionar janela
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (window.innerWidth > 767) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Fechar sidebar ao clicar em um link (mobile)
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 767) {
+                    toggleSidebar();
+                }
+            });
+        });
+    </script>
+    
     <!-- Scripts Customizados -->
     {% block scripts %}{% endblock %}
     {% block extra_js %} {% endblock %}
-
-    
 </body>
-
 </html>
