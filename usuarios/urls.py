@@ -9,6 +9,7 @@ urlpatterns = [
     path('logout/', views.logout_usuario, name='logout'),
     path('cadastro/', views.cadastrar_usuario, name='cadastro'),
     path('ativar/<str:token>/', views.ativar_conta, name='ativar_conta'),
+    path('reenviar-ativacao/', views.reenviar_email_ativacao, name='reenviar_ativacao'),
 
     # Painel
     path('dashboard/', views.dashboard, name='dashboard'),

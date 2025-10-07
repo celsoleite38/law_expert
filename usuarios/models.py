@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # --- Ativação de conta por e-mail ---
 class Ativacao(models.Model):
     token = models.CharField(max_length=64)
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     ativo = models.BooleanField(default=False)
     email = models.EmailField(max_length=254, default='example@example.com')
 

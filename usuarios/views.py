@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
@@ -19,6 +19,10 @@ from clientes.forms import ClienteForm
 from processos.models import Processo
 
 import uuid
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from .models import Ativacao
+from .forms import FormCadastroUsuario
 
 # --- Públicas / sem login ---
 
@@ -38,18 +42,48 @@ def cadastrar_usuario(request):
             )
 
             link_ativacao = request.build_absolute_uri(f'/usuarios/ativar/{token}/')
-            send_mail(
-                subject='Ative sua conta',
-                message=f'Olá, {usuario.username}!\nClique no link para ativar sua conta:\n{link_ativacao}',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[usuario.email],
-                fail_silently=False,
-            )
+            
+            # Contexto para o template
+            context = {
+                'usuario': usuario,
+                'email': usuario.email,
+                'link_ativacao': link_ativacao,
+            }
+            
+            # Renderizar o template HTML
+            html_message = render_to_string('usuarios/emails/email_ativacao.html', context)
+            
+            # Versão texto simples
+            plain_message = strip_tags(html_message)
+            
+            try:
+                send_mail(
+                    subject='Ative sua conta - Law Innosoft',
+                    message=plain_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[usuario.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
 
-            messages.success(request, 'Cadastro realizado! Verifique seu e-mail para ativar a conta.')
-            return redirect('usuarios:login')
+                messages.success(request, 'Cadastro realizado! Verifique seu e-mail para ativar a conta.')
+                return redirect('usuarios:login')
+                
+            except Exception as e:
+                # Em caso de erro no envio de email
+                usuario.delete()
+                messages.error(request, f'Erro ao enviar email de ativação. Tente novamente.')
+                print(f"Erro no envio de email: {e}")
+                # IMPORTANTE: Retornar a renderização mesmo em caso de erro
+                return render(request, 'usuarios/cadastro.html', {'form': form})
+        else:
+            # Se o formulário não for válido, renderiza novamente com erros
+            return render(request, 'usuarios/cadastro.html', {'form': form})
     else:
+        # GET request - mostrar formulário vazio
         form = FormCadastroUsuario()
+    
+    # RETURN FINAL - garante que sempre retorna HttpResponse
     return render(request, 'usuarios/cadastro.html', {'form': form})
 
 
@@ -64,6 +98,62 @@ def ativar_conta(request, token):
     else:
         messages.warning(request, 'Este link já foi utilizado.')
     return redirect('usuarios:login')
+
+def reenviar_email_ativacao(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        try:
+            # Buscar usuário pelo email
+            usuario = User.objects.get(email=email)
+            
+            # Verificar se já existe uma ativação pendente
+            try:
+                ativacao = Ativacao.objects.get(user=usuario, ativo=False)
+                # Se existir, usar o mesmo token
+                token = ativacao.token
+            except Ativacao.DoesNotExist:
+                # Se não existir, criar nova ativação
+                token = str(uuid.uuid4())
+                ativacao = Ativacao.objects.create(
+                    user=usuario,
+                    token=token,
+                    email=usuario.email
+                )
+            
+            # Gerar link de ativação
+            link_ativacao = request.build_absolute_uri(f'/usuarios/ativar/{token}/')
+            
+            # Contexto para o template
+            context = {
+                'usuario': usuario,
+                'email': usuario.email,
+                'link_ativacao': link_ativacao,
+            }
+            
+            # Renderizar e enviar email
+            html_message = render_to_string('usuarios/emails/email_ativacao.html', context)
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subject='Reenvio - Ative sua conta - Law Innosoft',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[usuario.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            
+            messages.success(request, 'Email de ativação reenviado com sucesso! Verifique sua caixa de entrada.')
+            return redirect('usuarios:login')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'Nenhuma conta encontrada com este email.')
+        except Exception as e:
+            messages.error(request, 'Erro ao reenviar email de ativação. Tente novamente.')
+            print(f"Erro no reenvio de email: {e}")
+    
+    return render(request, 'usuarios/reenviar_ativacao.html')
 
 
 def logar_usuario(request):
@@ -284,9 +374,6 @@ def listar_processos(request):
     
     processos = Processo.objects.filter(advogado_responsavel=dono)
     return render(request, 'processos/lista.html', {'processos': processos})
-
-
-
 
 
 @login_required

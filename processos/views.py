@@ -25,7 +25,7 @@ class ProcessoCreateView(LoginRequiredMixin, CreateView):
     model = Processo
     form_class = ProcessoForm
     template_name = 'processos/processo_form.html'
-    success_url = reverse_lazy('processos:lista')
+    success_url = reverse_lazy('processos:lista_processos')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -115,9 +115,23 @@ class ProcessoListView(LoginRequiredMixin, ListView):
     template_name = 'processos/processo_list.html'
     context_object_name = 'processos'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Adiciona as áreas de direito ao contexto
+        context['AREAS_DIREITO'] = Processo.AREAS_DIREITO
+        context['selected_area_direito'] = self.request.GET.get('area_direito', '')
+        return context
+
     def get_queryset(self):
         dono = advogado_dono(self.request)
         queryset = Processo.objects.filter(advogado_responsavel=dono)
+        
+        # Filtro por área de direito
+        area_direito = self.request.GET.get('area_direito')
+        if area_direito:
+            queryset = queryset.filter(area_direito=area_direito)
+        
+        # Filtro por busca textual
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
@@ -125,6 +139,7 @@ class ProcessoListView(LoginRequiredMixin, ListView):
                 Q(cliente__nome__icontains=query) |
                 Q(descricao__icontains=query)
             )
+        
         return queryset.order_by('-data_cadastro')
 
 
