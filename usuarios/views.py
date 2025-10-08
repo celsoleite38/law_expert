@@ -42,20 +42,20 @@ def cadastrar_usuario(request):
             )
 
             link_ativacao = request.build_absolute_uri(f'/usuarios/ativar/{token}/')
-            
+
             # Contexto para o template
             context = {
                 'usuario': usuario,
                 'email': usuario.email,
                 'link_ativacao': link_ativacao,
             }
-            
+
             # Renderizar o template HTML
             html_message = render_to_string('usuarios/emails/email_ativacao.html', context)
-            
+
             # Versão texto simples
             plain_message = strip_tags(html_message)
-            
+
             try:
                 send_mail(
                     subject='Ative sua conta - Law Innosoft',
@@ -68,23 +68,24 @@ def cadastrar_usuario(request):
 
                 messages.success(request, 'Cadastro realizado! Verifique seu e-mail para ativar a conta.')
                 return redirect('usuarios:login')
-                
             except Exception as e:
-                # Em caso de erro no envio de email
-                usuario.delete()
-                messages.error(request, f'Erro ao enviar email de ativação. Tente novamente.')
-                print(f"Erro no envio de email: {e}")
-                # IMPORTANTE: Retornar a renderização mesmo em caso de erro
-                return render(request, 'usuarios/cadastro.html', {'form': form})
+                            # Em caso de erro no envio de email
+                            usuario.delete()
+                            messages.error(request, f'Erro ao enviar email de ativação. Tente novamente.')
+                            print(f"Erro no envio de email: {e}")
+                            # IMPORTANTE: Retornar a renderização mesmo em caso de erro
+                            return render(request, 'usuarios/cadastro.html', {'form': form})
         else:
             # Se o formulário não for válido, renderiza novamente com erros
             return render(request, 'usuarios/cadastro.html', {'form': form})
     else:
         # GET request - mostrar formulário vazio
         form = FormCadastroUsuario()
-    
+
     # RETURN FINAL - garante que sempre retorna HttpResponse
     return render(request, 'usuarios/cadastro.html', {'form': form})
+
+
 
 
 def ativar_conta(request, token):

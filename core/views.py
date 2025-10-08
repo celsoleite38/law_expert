@@ -14,7 +14,7 @@ def dashboard(request):
     hoje = now()
 
     # 3. USE 'dono_da_conta' EM TODAS AS BUSCAS NO BANCO DE DADOS
-    processos_recentes = Processo.objects.filter(advogado_responsavel=dono_da_conta).order_by('-data_cadastro')[:10]
+    processos_recentes = Processo.objects.filter(advogado_responsavel=dono_da_conta, status__in=['ANDAMENTO', 'CONCLUIDO']).order_by('-data_cadastro')[:10]
     
     compromissos = Audiencia.objects.filter(
         models.Q(processo__advogado_responsavel=dono_da_conta) |  # Compromissos com processo

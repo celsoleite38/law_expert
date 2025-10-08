@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Colaborador, PerfilProfissional, PermissaoColaborador
-
+import re  # Importe o módulo de expressões regulares
+from django.core.exceptions import ValidationError
 
 # --- Cadastro de usuário padrão ---
 class FormCadastroUsuario(UserCreationForm):
@@ -11,6 +12,34 @@ class FormCadastroUsuario(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+
+    def clean_username(self):
+        """
+        Valida o campo username para permitir apenas letras e números,
+        e fornece uma mensagem de erro personalizada.
+        """
+        username = self.cleaned_data.get('username')
+        
+        # Regex que verifica se a string contém APENAS letras (a-z, A-Z) e números (0-9)
+        if not re.match("^[a-zA-Z0-9]+$", username):
+            raise ValidationError(
+                "Nome de usuário inválido. Por favor, use apenas letras e números, sem espaços ou símbolos."
+            )
+            
+        # Verifica se o usuário já existe (o Django já faz isso, mas podemos personalizar a mensagem aqui também)
+        if User.objects.filter(username__iexact=username).exists():
+            raise ValidationError("Este nome de usuário já está em uso. Por favor, escolha outro.")
+
+        return username
+    # ================================================================= #
+
+    def clean_password2(self):
+        # ... (seu método clean_password2)
+        return self.cleaned_data.get('password2')
+
+    def save(self, commit=True):
+        # ... (seu método save)
+        return super().save(commit=commit)
 
 
 # --- Perfil profissional do advogado ---
@@ -32,6 +61,7 @@ class PerfilProfissionalForm(forms.ModelForm):
             'celular': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+    
 
 # --- Cadastro de colaborador ---
 class CadastroColaboradorForm(forms.ModelForm):

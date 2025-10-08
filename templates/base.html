@@ -326,6 +326,11 @@
                                 <i class="fas fa-cog me-2"></i> Notificações
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'processos:arquivados' %}">
+                                <i class="fas fa-archive me-2"></i>Processos Arquivados
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -343,11 +348,11 @@
                         <span class="navbar-brand">
                             {% block page_title %}{% endblock %}
                             <span class="user-info-desktop">
-                                <strong>Bem vindo</strong>
+                                <strong>Bem vindo(a)</strong>&nbsp; &nbsp;
                                 <font color="ffffffff" size="5">
                                 <strong>
                                     {% if request.user.tipo_usuario == 'ADV' %}
-                                        {{ request.user.perfilprofissional.nome_completo }}
+                                        {{ request.user.perfilprofissional.nome_completo }}&nbsp;
                                         | OAB {{ request.user.perfilprofissional.oab }}
                                     {% elif request.user.tipo_usuario == 'COLAB' %}
                                         {{ request.user.colaborador_vinculado.nome }}

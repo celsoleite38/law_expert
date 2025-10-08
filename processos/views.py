@@ -124,7 +124,7 @@ class ProcessoListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         dono = advogado_dono(self.request)
-        queryset = Processo.objects.filter(advogado_responsavel=dono)
+        queryset = Processo.objects.filter(advogado_responsavel=dono, status__in=['ANDAMENTO', 'CONCLUIDO'])
         
         # Filtro por área de direito
         area_direito = self.request.GET.get('area_direito')
@@ -197,3 +197,55 @@ def arquivar_processo(request, pk):
 
     messages.success(request, f"O processo {processo.numero} foi arquivado com sucesso.")
     return redirect('processos:detalhe_processo', pk=pk)
+
+# processos/views.py
+@method_decorator(exige_permissao('listar_processos'), name='dispatch')
+class ProcessosArquivadosListView(LoginRequiredMixin, ListView):
+    model = Processo
+    template_name = 'processos/processos_arquivados.html'
+    context_object_name = 'processos'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['AREAS_DIREITO'] = Processo.AREAS_DIREITO
+        context['selected_area_direito'] = self.request.GET.get('area_direito', '')
+        return context
+
+    def get_queryset(self):
+        dono = advogado_dono(self.request)
+        # Filtra apenas processos arquivados
+        queryset = Processo.objects.filter(
+            advogado_responsavel=dono,
+            status='ARQUIVADO'
+        )
+        
+        # Filtro por área de direito
+        area_direito = self.request.GET.get('area_direito')
+        if area_direito:
+            queryset = queryset.filter(area_direito=area_direito)
+        
+        # Filtro por busca textual
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(
+                Q(numero__icontains=query) |
+                Q(cliente__nome__icontains=query) |
+                Q(descricao__icontains=query)
+            )
+        
+        return queryset.order_by('-data_cadastro')
+    
+    # processos/views.py
+@login_required
+def desarquivar_processo(request, pk):
+    processo = get_object_or_404(Processo, pk=pk)
+
+    if processo.advogado_responsavel != advogado_dono(request):
+        messages.error(request, "Você não tem permissão para desarquivar este processo.")
+        return redirect('processos:arquivados')
+
+    processo.status = 'ANDAMENTO', 'CONCLUIDO'  # Ou outro status desejado
+    processo.save()
+
+    messages.success(request, f"O processo {processo.numero} foi desarquivado com sucesso.")
+    return redirect('processos:arquivados')

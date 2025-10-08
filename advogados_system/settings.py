@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-^qo07y+g!vw2&hg3mu4*l^+m*$s$%r9b5+4galr635+vdpkj-2
 DEBUG = True
 APPEND_SLASH = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['law.innosoft.com.br', 'localhost', '127.0.0.1']
 
 
 # Application definition

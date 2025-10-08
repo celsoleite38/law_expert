@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -22,31 +23,71 @@
     </form>
   </div>
 
+  <!-- Layout de 2 colunas -->
   <div class="row">
     {% for processo in processos %}
-      <div class="col-md-6 mb-4">
+      <div class="col-12 col-md-6 mb-4">  <!-- 2 colunas em desktop, 1 coluna em mobile -->
         <div class="card h-100 shadow-sm" style="border: 2px solid #2c3e50;">
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ processo.numero }}</h5>
             <h6 class="card-subtitle mb-2 text-muted fw-bold">{{ processo.cliente.nome }}</h6>
-            <p class="card-text"><strong>Status:</strong> {{ processo.get_status_display }}</p>
-            <p class="card-text"><strong>Descrição:</strong> {{ processo.descricao|truncatechars:100 }}</p>
-            <p class="card-text"><strong>Área de Atuação:</strong> {{ processo.get_area_direito_display|default:"-" }}</p>
-            <p class="card-text"><small class="text-muted">Cadastrado em: {{ processo.data_cadastro|date:"d/m/Y H:i" }}</small></p>
+            
+            <div class="card-text flex-grow-1">
+              <p class="mb-1"><strong>Status:</strong> {{ processo.get_status_display }}</p>
+              <p class="mb-1"><strong>Descrição:</strong> {{ processo.descricao|truncatechars:100 }}</p>
+              <p class="mb-1"><strong>Área de Atuação:</strong> {{ processo.get_area_direito_display|default:"-" }}</p>
+              <p class="mb-0"><small class="text-muted">Cadastrado em: {{ processo.data_cadastro|date:"d/m/Y H:i" }}</small></p>
+            </div>
 
-            <div class="mt-auto">
-              <a href="{% url 'processos:detalhe_processo' pk=processo.pk %}" class="btn btn-sm" style="background-color:  #2c3e50; color: white; border: 1px solid #00007d;"">Ver Detalhes</a>
-              <a href="{% url 'processos:editar_processo' pk=processo.pk %}" class="btn btn-sm"style="background-color:  #6e5d0fff; color: white; border: 1px solid #00007d;">Editar</a>
-              {% if processo.status != 'ARQUIVADO' %}
-                <a href="{% url 'processos:arquivar_processo' pk=processo.pk %}" class="btn btn-sm"style="background-color:  #d32f2fff; color: white; border: 1px solid #00007d;">Arquivar</a>
-              {% endif %}
+            <div class="mt-auto pt-3">
+              <div class="btn-group w-100" role="group">
+                <a href="{% url 'processos:detalhe_processo' pk=processo.pk %}" class="btn btn-sm" style="background-color: #2c3e50; color: white; border: 1px solid #00007d;">
+                  Ver Detalhes
+                </a>
+                <a href="{% url 'processos:editar_processo' pk=processo.pk %}" class="btn btn-sm" style="background-color: #6e5d0f; color: white; border: 1px solid #00007d;">
+                  Editar
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-warning" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#arquivarModal{{ processo.pk }}">
+                  <i class="fas fa-archive"></i> Arquivar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de Arquivamento - FORA DO CARD -->
+      <div class="modal fade" id="arquivarModal{{ processo.pk }}" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Arquivar Processo</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p>Tem certeza que deseja arquivar o processo <strong>{{ processo.numero }}</strong>?</p>
+              <p class="text-muted small">Este processo será movido para a lista de processos arquivados.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <form method="post" action="{% url 'processos:arquivar' pk=processo.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">
+                  <i class="fas fa-archive me-1"></i>Arquivar
+                </button>
+              </form>
             </div>
           </div>
         </div>
       </div>
     {% empty %}
       <div class="col-12">
-        <p class="text-muted">Nenhum processo cadastrado.</p>
+        <div class="text-center py-5">
+          <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+          <p class="text-muted">Nenhum processo cadastrado.</p>
+        </div>
       </div>
     {% endfor %}
   </div>
