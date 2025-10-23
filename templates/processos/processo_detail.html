@@ -21,7 +21,7 @@
     <div class="card-footer d-flex justify-content-end">
       <a href="{% url 'processos:editar_processo' pk=processo.pk %}" class="btn btn-sm btn-primary me-2">Editar Processo</a>
       {% if processo.status != 'ARQUIVADO' %}
-        <a href="{% url 'processos:arquivar_processo' pk=processo.pk %}" class="btn btn-sm btn-warning">Arquivar</a>
+        <a href="{% url 'processos:arquivar' pk=processo.pk %}" class="btn btn-sm btn-warning">Arquivar</a>
       {% endif %}
     </div>
   </div>

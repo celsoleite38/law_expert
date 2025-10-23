@@ -177,6 +177,13 @@ def logout_usuario(request):
 
 @login_required
 def dashboard(request):
+    perfil, created = PerfilProfissional.objects.get_or_create(usuario=request.user)
+
+    # Verifica se o perfil está incompleto
+    if created or not perfil.nome_completo or not perfil.oab or not perfil.cpf:
+        messages.warning(request, 'Por favor, complete seu perfil profissional para acessar todas as funcionalidades.')
+        return redirect('usuarios:editar_advogado')
+
     return render(request, 'core/dashboard.html')
 
 

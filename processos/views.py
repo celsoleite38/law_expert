@@ -185,6 +185,7 @@ class AndamentoCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy('processos:detalhe_processo', kwargs={'pk': self.kwargs['processo_id']})
 
 @login_required
+@exige_permissao('editar_processo')
 def arquivar_processo(request, pk):
     processo = get_object_or_404(Processo, pk=pk)
 
@@ -244,7 +245,7 @@ def desarquivar_processo(request, pk):
         messages.error(request, "Você não tem permissão para desarquivar este processo.")
         return redirect('processos:arquivados')
 
-    processo.status = 'ANDAMENTO', 'CONCLUIDO'  # Ou outro status desejado
+    processo.status = 'CONCLUIDO'  # Ou outro status desejado
     processo.save()
 
     messages.success(request, f"O processo {processo.numero} foi desarquivado com sucesso.")
