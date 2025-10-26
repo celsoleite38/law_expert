@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>🎛️ Painel de Controle da Agenda</h2>
+            <p class="text-muted">Gerencie seus horários de atendimento e bloqueios de agenda</p>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_horarios }}</h4>
+                            <p>Horários Cadastrados</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ total_bloqueios_ativos }}</h4>
+                            <p>Bloqueios Ativos</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-ban fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ proximos_compromissos|length }}</h4>
+                            <p>Próximos Compromissos</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Próximos Compromissos -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📅 Próximos Compromissos</h5>
+                    <a href="{% url 'agenda:agenda' %}" class="btn btn-sm btn-outline-primary">Ver Agenda</a>
+                </div>
+                <div class="card-body">
+                    {% if proximos_compromissos %}
+                    <div class="list-group list-group-flush">
+                        {% for compromisso in proximos_compromissos %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ compromisso.get_tipo_display }}</h6>
+                                <small>{{ compromisso.data_hora|date:"d/m H:i" }}</small>
+                            </div>
+                            <p class="mb-1">
+                                {% if compromisso.processo %}
+                                    Proc: {{ compromisso.processo.numero }}
+                                {% else %}
+                                    Cliente: {{ compromisso.cliente.nome }}
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">{{ compromisso.local }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">Nenhum compromisso agendado</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos Bloqueios -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">🚫 Próximos Bloqueios</h5>
+                    <a href="{% url 'agenda:lista_bloqueios' %}" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+                </div>
+                <div class="card-body">
+                    {% if proximos_bloqueios %}
+                    <div class="list-group list-group-flush">
+                        {% for bloqueio in proximos_bloqueios %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ bloqueio.titulo }}</h6>
+                                <span class="badge bg-info">{{ bloqueio.get_tipo_bloqueio_display }}</span>
+                            </div>
+                            <p class="mb-1">
+                                {{ bloqueio.data_inicio|date:"d/m/Y" }} 
+                                {% if bloqueio.data_inicio != bloqueio.data_fim %}
+                                    a {{ bloqueio.data_fim|date:"d/m/Y" }}
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">
+                                {% if bloqueio.dia_todo %}
+                                    Dia Todo
+                                {% else %}
+                                    {{ bloqueio.hora_inicio|time:"H:i" }} - {{ bloqueio.hora_fim|time:"H:i" }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-ban fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">Nenhum bloqueio agendado</p>
+                        <a href="{% url 'agenda:novo_bloqueio' %}" class="btn btn-sm btn-primary">Cadastrar Bloqueio</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">⚡ Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <a href="{% url 'agenda:nova_audiencia' %}" class="btn btn-success btn-lg w-100 mb-2">
+                                <i class="fas fa-plus-circle me-2"></i>Novo Evento
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{% url 'agenda:lista_horarios' %}" class="btn btn-primary btn-lg w-100 mb-2">
+                                <i class="fas fa-clock me-2"></i>Horários
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{% url 'agenda:lista_bloqueios' %}" class="btn btn-warning btn-lg w-100 mb-2">
+                                <i class="fas fa-ban me-2"></i>Bloqueios
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <a href="{% url 'agenda:agenda' %}" class="btn btn-info btn-lg w-100 mb-2">
+                                <i class="fas fa-calendar me-2"></i>Calendário
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

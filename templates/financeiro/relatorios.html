@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios Financeiros{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Relatórios Financeiros</h2>
+
+    <!-- Filtros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="data_inicial" class="form-label">Data Inicial</label>
+                    <input type="date" class="form-control" id="data_inicial" name="data_inicial" value="{{ data_inicial|default:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="data_final" class="form-label">Data Final</label>
+                    <input type="date" class="form-control" id="data_final" name="data_final" value="{{ data_final|default:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary me-2"><i class="fas fa-filter me-2"></i>Aplicar Filtros</button>
+                    <a href="{% url 'financeiro:relatorios_financeiros' %}" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resumo Financeiro -->
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Receitas</h5>
+                    <p class="card-text fs-3">R$ {{ total_receitas|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Despesas</h5>
+                    <p class="card-text fs-3">R$ {{ total_despesas|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Saldo (Receitas - Despesas)</h5>
+                    <p class="card-text fs-3">R$ {{ saldo_final|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos por Categoria -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Receitas por Categoria</h5>
+                </div>
+                <div class="card-body">
+                    {% if chart_receita_data %}
+                    <canvas id="receitasChart"></canvas>
+                    {% else %}
+                    <p class="text-center">Nenhuma receita no período.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Despesas por Categoria</h5>
+                </div>
+                <div class="card-body">
+                    {% if chart_despesa_data %}
+                    <canvas id="despesasChart"></canvas>
+                    {% else %}
+                    <p class="text-center">Nenhuma despesa no período.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exportar -->
+    <div class="row mb-4">
+        <div class="col-12 text-end">
+            <a href="{% url 'financeiro:exportar_relatorio' %}{% if data_inicial %}?data_inicial={{ data_inicial }}{% endif %}{% if data_final %}{% if data_inicial %}&{% else %}?{% endif %}data_final={{ data_final }}{% endif %}" class="btn btn-dark">
+                <i class="fas fa-file-csv me-2"></i> Exportar Transações (CSV)
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Função para gerar cores dinâmicas
+    function generateColors(count) {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            colors.push(`hsl(${i * (360 / count)}, 70%, 50%)`);
+        }
+        return colors;
+    }
+
+    // Gráfico de Receitas
+    const receitasLabels = JSON.parse('{{ chart_receita_labels|safe }}'.replace(/'/g, '"'));
+    const receitasData = JSON.parse('{{ chart_receita_data|safe }}'.replace(/'/g, '"'));
+    if (receitasData.length > 0) {
+        const receitasCtx = document.getElementById('receitasChart').getContext('2d');
+        new Chart(receitasCtx, {
+            type: 'doughnut',
+            data: {
+                labels: receitasLabels,
+                datasets: [{
+                    data: receitasData,
+                    backgroundColor: generateColors(receitasData.length),
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += 'R$ ' + context.parsed.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico de Despesas
+    const despesasLabels = JSON.parse('{{ chart_despesa_labels|safe }}'.replace(/'/g, '"'));
+    const despesasData = JSON.parse('{{ chart_despesa_data|safe }}'.replace(/'/g, '"'));
+    if (despesasData.length > 0) {
+        const despesasCtx = document.getElementById('despesasChart').getContext('2d');
+        new Chart(despesasCtx, {
+            type: 'doughnut',
+            data: {
+                labels: despesasLabels,
+                datasets: [{
+                    data: despesasData,
+                    backgroundColor: generateColors(despesasData.length),
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += 'R$ ' + context.parsed.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

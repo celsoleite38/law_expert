@@ -1,0 +1,17 @@
+<!-- agenda/horarios_disponiveis.html -->
+<div class="alert alert-info mt-3">
+    <h6><i class="fas fa-clock me-2"></i>Horários de Atendimento para {{ dia_semana }}</h6>
+    {% if horarios %}
+        <div class="row mt-2">
+            {% for horario in horarios %}
+            <div class="col-md-6">
+                <strong>{{ horario.get_dia_semana_display }}</strong><br>
+                {{ horario.hora_inicio|time:"H:i" }} às {{ horario.hora_fim|time:"H:i" }}<br>
+                <small class="text-muted">Slots de {{ horario.duracao_slot }}min</small>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted mb-0">Nenhum horário cadastrado para este dia</p>
+    {% endif %}
+</div>

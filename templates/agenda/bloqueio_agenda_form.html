@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        {% if object %}
+                            🚫 Editar Bloqueio de Agenda
+                        {% else %}
+                            🚫 Novo Bloqueio de Agenda
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- Título -->
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>Título do Bloqueio *
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.titulo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Tipo de Bloqueio -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_bloqueio.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Tipo de Bloqueio *
+                                </label>
+                                {{ form.tipo_bloqueio }}
+                                {% if form.tipo_bloqueio.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.tipo_bloqueio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Dia Todo -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de Período</label>
+                                <div class="form-check form-switch mt-2">
+                                    {{ form.dia_todo }}
+                                    <label class="form-check-label" for="{{ form.dia_todo.id_for_label }}">
+                                        Bloquear Dia Inteiro
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    Marque para bloquear o dia todo, sem horários específicos
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Data Início -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_inicio.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-plus me-1"></i>Data Início *
+                                </label>
+                                {{ form.data_inicio }}
+                                {% if form.data_inicio.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.data_inicio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Data Fim -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_fim.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-minus me-1"></i>Data Fim *
+                                </label>
+                                {{ form.data_fim }}
+                                {% if form.data_fim.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.data_fim.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Horários (só aparece se não for dia todo) -->
+                        <div id="horarios-section" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.hora_inicio.id_for_label }}" class="form-label">
+                                        <i class="fas fa-clock me-1"></i>Hora Início
+                                    </label>
+                                    {{ form.hora_inicio }}
+                                    {% if form.hora_inicio.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.hora_inicio.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.hora_fim.id_for_label }}" class="form-label">
+                                        <i class="fas fa-clock me-1"></i>Hora Fim
+                                    </label>
+                                    {{ form.hora_fim }}
+                                    {% if form.hora_fim.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.hora_fim.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="mb-3">
+                            <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Descrição (Opcional)
+                            </label>
+                            {{ form.descricao }}
+                            <div class="form-text">
+                                Informações adicionais sobre o motivo do bloqueio
+                            </div>
+                            {% if form.descricao.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.descricao.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Resumo -->
+                        <div class="alert alert-warning mt-4">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Resumo do Bloqueio</h6>
+                            <div id="resumo-bloqueio">
+                                <small class="text-muted">Preencha os campos acima para ver o resumo</small>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'agenda:lista_bloqueios' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar para Lista
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save me-1"></i>
+                                    {% if object %}Atualizar{% else %}Salvar{% endif %} Bloqueio
+                                </button>
+                                {% if object %}
+                                    <a href="{% url 'agenda:deletar_bloqueio' object.pk %}" class="btn btn-danger ms-2">
+                                        <i class="fas fa-trash me-1"></i> Excluir
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const diaTodoCheckbox = document.getElementById('id_dia_todo');
+    const horariosSection = document.getElementById('horarios-section');
+    
+    // Controla visibilidade dos horários
+    function toggleHorarios() {
+        if (diaTodoCheckbox.checked) {
+            horariosSection.style.display = 'none';
+            // Limpa os campos de horário quando desabilitado
+            document.getElementById('id_hora_inicio').value = '';
+            document.getElementById('id_hora_fim').value = '';
+        } else {
+            horariosSection.style.display = 'block';
+        }
+        atualizarResumo();
+    }
+    
+    diaTodoCheckbox.addEventListener('change', toggleHorarios);
+    toggleHorarios(); // Executa inicialmente
+    
+    // Atualiza resumo
+    function atualizarResumo() {
+        const titulo = document.getElementById('id_titulo').value || 'Sem título';
+        const tipo = document.getElementById('id_tipo_bloqueio');
+        const tipoTexto = tipo.options[tipo.selectedIndex]?.text || 'Não definido';
+        const dataInicio = document.getElementById('id_data_inicio').value;
+        const dataFim = document.getElementById('id_data_fim').value;
+        const horaInicio = document.getElementById('id_hora_inicio').value;
+        const horaFim = document.getElementById('id_hora_fim').value;
+        const diaTodo = diaTodoCheckbox.checked;
+        
+        const resumo = document.getElementById('resumo-bloqueio');
+        
+        if (dataInicio) {
+            let periodo = dataInicio;
+            if (dataFim && dataFim !== dataInicio) {
+                periodo += ` a ${dataFim}`;
+            }
+            
+            let horario = diaTodo ? 'Dia todo' : `${horaInicio || '--:--'} às ${horaFim || '--:--'}`;
+            
+            resumo.innerHTML = `
+                <strong>${titulo}</strong><br>
+                <strong>Tipo</strong>: ${tipoTexto}<br>
+                <strong>Período</strong>: ${periodo}<br>
+                <strong>Horário</strong>: ${horario}<br>
+                <strong>Status</strong>: ⚠️ Agenda bloqueada neste período
+            `;
+        } else {
+            resumo.innerHTML = '<small class="text-muted">Preencha os campos acima para ver o resumo</small>';
+        }
+    }
+    
+    // Listeners para atualizar resumo
+    const campos = ['id_titulo', 'id_tipo_bloqueio', 'id_data_inicio', 'id_data_fim', 'id_hora_inicio', 'id_hora_fim'];
+    campos.forEach(campo => {
+        const element = document.getElementById(campo);
+        if (element) {
+            element.addEventListener('change', atualizarResumo);
+            element.addEventListener('input', atualizarResumo);
+        }
+    });
+    
+    atualizarResumo();
+});
+</script>
+{% endblock %}

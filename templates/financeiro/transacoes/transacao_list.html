@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transações Financeiras{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Transações Financeiras</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="{% url 'financeiro:nova_transacao' %}?tipo=RECEITA" class="btn btn-success me-2">
+                <i class="fas fa-plus-circle me-2"></i> Nova Receita
+            </a>
+            <a href="{% url 'financeiro:nova_transacao' %}?tipo=DESPESA" class="btn btn-danger">
+                <i class="fas fa-minus-circle me-2"></i> Nova Despesa
+            </a>
+        </div>
+        <div class="btn-group">
+            <a href="{% url 'financeiro:lista_transacoes' %}" class="btn {% if not tipo_filtro %}btn-primary{% else %}btn-outline-primary{% endif %}">Todas</a>
+            <a href="{% url 'financeiro:lista_transacoes' %}?tipo=RECEITA" class="btn {% if tipo_filtro == 'RECEITA' %}btn-success{% else %}btn-outline-success{% endif %}">Receitas</a>
+            <a href="{% url 'financeiro:lista_transacoes' %}?tipo=DESPESA" class="btn {% if tipo_filtro == 'DESPESA' %}btn-danger{% else %}btn-outline-danger{% endif %}">Despesas</a>
+        </div>
+    </div>
+
+    {% if transacoes %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Categoria</th>
+                            <th>Processo</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transacao in transacoes %}
+                        <tr>
+                            <td>{{ transacao.data_transacao|date:"d/m/Y" }}</td>
+                            <td><a href="{% url 'financeiro:detalhe_transacao' transacao.pk %}">{{ transacao.descricao }}</a></td>
+                            <td>{{ transacao.categoria.nome|default:"N/A" }}</td>
+                            <td>{{ transacao.processo.numero_processo|default:"N/A" }}</td>
+                            <td class="{% if transacao.tipo == 'RECEITA' %}text-success{% else %}text-danger{% endif %}">
+                                R$ {{ transacao.valor|floatformat:2 }}
+                            </td>
+                            <td>
+                                <span class="badge {% if transacao.tipo == 'RECEITA' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ transacao.get_tipo_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'financeiro:editar_transacao' transacao.pk %}" class="btn btn-sm btn-primary me-2" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'financeiro:excluir_transacao' transacao.pk %}" class="btn btn-sm btn-danger" title="Excluir">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Paginação -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}">Anterior</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}">Próxima</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Nenhuma transação financeira encontrada. <a href="{% url 'financeiro:nova_transacao' %}">Adicione uma agora!</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

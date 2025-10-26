@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Categoria{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Excluir Categoria Financeira</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p>Você tem certeza que deseja excluir a categoria "<strong>{{ categoria.nome }}</strong>"?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger me-2"><i class="fas fa-trash-alt me-2"></i>Confirmar Exclusão</button>
+                <a href="{% url 'financeiro:lista_categorias' %}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

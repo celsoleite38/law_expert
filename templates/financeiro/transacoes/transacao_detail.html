@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes da Transação{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Detalhes da Transação</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">{{ transacao.descricao }}</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Tipo:</strong> <span class="badge {% if transacao.tipo == 'RECEITA' %}bg-success{% else %}bg-danger{% endif %}">{{ transacao.get_tipo_display }}</span></p>
+            <p><strong>Valor:</strong> R$ {{ transacao.valor|floatformat:2 }}</p>
+            <p><strong>Data da Transação:</strong> {{ transacao.data_transacao|date:"d/m/Y" }}</p>
+            <p><strong>Categoria:</strong> {{ transacao.categoria.nome|default:"N/A" }}</p>
+            <p><strong>Processo Vinculado:</strong> {% if transacao.processo %}<a href="{% url 'processos:detalhe_processo' transacao.processo.pk %}">{{ transacao.processo.numero_processo }}</a>{% else %}N/A{% endif %}</p>
+            <p><strong>Data de Criação:</strong> {{ transacao.data_criacao|date:"d/m/Y H:i" }}</p>
+
+            <hr>
+
+            <a href="{% url 'financeiro:editar_transacao' transacao.pk %}" class="btn btn-primary me-2"><i class="fas fa-edit me-2"></i>Editar</a>
+            <a href="{% url 'financeiro:excluir_transacao' transacao.pk %}" class="btn btn-danger me-2"><i class="fas fa-trash-alt me-2"></i>Excluir</a>
+            <a href="{% url 'financeiro:lista_transacoes' %}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Voltar para Transações</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

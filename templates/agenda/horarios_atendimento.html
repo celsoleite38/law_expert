@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🕐 Horários de Atendimento</h2>
+        <a href="{% url 'agenda:novo_horario' %}" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i> Novo Horário
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if horarios %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Dia da Semana</th>
+                            <th>Horário</th>
+                            <th>Duração Slot</th>
+                            <th>Máx. Compromissos</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for horario in horarios %}
+                        <tr>
+                            <td>{{ horario.get_dia_semana_display }}</td>
+                            <td>{{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fim|time:"H:i" }}</td>
+                            <td>{{ horario.duracao_slot }} minutos</td>
+                            <td>{{ horario.max_compromissos }}</td>
+                            <td>
+                                <span class="badge {% if horario.ativo %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ horario.ativo|yesno:"Ativo,Inativo" }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'agenda:editar_horario' horario.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                <h5>Nenhum horário cadastrado</h5>
+                <p class="text-muted">Cadastre seus horários de atendimento para começar.</p>
+                <a href="{% url 'agenda:novo_horario' %}" class="btn btn-primary">Cadastrar Primeiro Horário</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

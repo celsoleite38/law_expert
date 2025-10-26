@@ -307,19 +307,67 @@
                             </a>
                         </li>
                         
-                        <li class="nav-item">
-                            <a class="nav-link {% if 'agenda' in request.resolver_match.namespace %}active{% endif %}" 
-                               href="{% url 'agenda:agenda' %}">
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if 'agenda' in request.resolver_match.namespace %}active{% endif %}" 
+                            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-calendar-alt me-2"></i> Agenda
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}" 
+                                    href="{% url 'agenda:agenda' %}">
+                                        <i class="fas fa-calendar me-2"></i> Calendário
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'painel_controle' %}active{% endif %}" 
+                                    href="{% url 'agenda:painel_controle' %}">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Painel de Controle
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'nova_audiencia' %}active{% endif %}" 
+                                    href="{% url 'agenda:nova_audiencia' %}">
+                                        <i class="fas fa-plus-circle me-2"></i> Novo Evento
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'lista_audiencias' %}active{% endif %}" 
+                                    href="{% url 'agenda:lista_audiencias' %}">
+                                        <i class="fas fa-list me-2"></i> Todos os Eventos
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'lista_horarios' %}active{% endif %}" 
+                                    href="{% url 'agenda:lista_horarios' %}">
+                                        <i class="fas fa-clock me-2"></i> Horários de Atendimento
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'lista_bloqueios' %}active{% endif %}" 
+                                    href="{% url 'agenda:lista_bloqueios' %}">
+                                        <i class="fas fa-ban me-2"></i> Bloqueios de Agenda
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.resolver_match.url_name == 'configuracoes' %}active{% endif %}" 
+                                    href="{% url 'agenda:configuracoes' %}">
+                                        <i class="fas fa-cog me-2"></i> Configurações
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'financeiro' in request.resolver_match.namespace %}active{% endif %}" 
+                               href="{% url 'financeiro:dashboard_financeiro' %}">
+                                <i class="fas fa-chart-line me-2"></i> Financeiro
                             </a>
                         </li>
                         
-                        <li class="nav-item">
-                            <a class="nav-link {% if 'financeiro' in request.resolver_match.namespace %}active{% endif %}" 
-                               href="{% url 'financeiro:lista_honorarios' %}">
-                                <i class="fas fa-dollar-sign me-2"></i> Financeiro
-                            </a>
-                        </li>
+                        
                         
                         <li class="nav-item mt-4">
                             <a class="nav-link" href="{% url 'notificacoes:painel' %}">

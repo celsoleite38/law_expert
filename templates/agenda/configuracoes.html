@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>⚙️ Configurações da Agenda</h2>
+            <p class="text-muted">Configure as preferências do seu sistema de agenda</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📋 Preferências Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Duração padrão dos slots (minutos)</label>
+                            <input type="number" class="form-control" value="60" min="15" step="15">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Máximo de compromissos por slot</label>
+                            <input type="number" class="form-control" value="1" min="1">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="notificacoesEmail" checked>
+                            <label class="form-check-label" for="notificacoesEmail">
+                                Receber notificações por e-mail
+                            </label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="lembreteAutomatico" checked>
+                            <label class="form-check-label" for="lembreteAutomatico">
+                                Lembretes automáticos 24h antes
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🔗 Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'agenda:lista_horarios' %}" class="btn btn-outline-primary text-start">
+                            <i class="fas fa-clock me-2"></i> Gerenciar Horários de Atendimento
+                        </a>
+                        <a href="{% url 'agenda:lista_bloqueios' %}" class="btn btn-outline-warning text-start">
+                            <i class="fas fa-ban me-2"></i> Gerenciar Bloqueios de Agenda
+                        </a>
+                        <a href="{% url 'agenda:painel_controle' %}" class="btn btn-outline-info text-start">
+                            <i class="fas fa-tachometer-alt me-2"></i> Painel de Controle
+                        </a>
+                        <a href="{% url 'agenda:agenda' %}" class="btn btn-outline-success text-start">
+                            <i class="fas fa-calendar me-2"></i> Voltar para Calendário
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">📊 Estatísticas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4>{{ total_horarios|default:"0" }}</h4>
+                            <small class="text-muted">Horários Ativos</small>
+                        </div>
+                        <div class="col-6">
+                            <h4>{{ total_bloqueios_ativos|default:"0" }}</h4>
+                            <small class="text-muted">Bloqueios Ativos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

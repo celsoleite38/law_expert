@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Condição de Pagamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Tem certeza que deseja excluir a condição de pagamento?</p>
+                    
+                    <div class="alert alert-warning">
+                        <strong>{{ object.nome }}</strong><br>
+                        {{ object.numero_parcelas }} parcelas • {{ object.intervalo_dias }} dias de intervalo
+                    </div>
+
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Esta ação não pode ser desfeita. Honorários que utilizam esta condição de pagamento 
+                        não serão afetados, mas novas criações não poderão usá-la.
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'financeiro:lista_condicoes_pagamento' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

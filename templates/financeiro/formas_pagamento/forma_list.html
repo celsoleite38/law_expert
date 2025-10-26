@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Formas de Pagamento{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Formas de Pagamento</h2>
+        <a href="{% url 'financeiro:nova_forma_pagamento' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nova Forma de Pagamento
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if object_list %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for forma in object_list %}
+                            <tr>
+                                <td>{{ forma.nome }}</td>
+                                <td>{{ forma.descricao|default:"-" }}</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhuma forma de pagamento cadastrada</h5>
+                    <p class="text-muted">Clique no botão acima para adicionar a primeira forma de pagamento.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
+{% block content %}
 <style>
   .tipo-select option[value="forum"] {
     background-color: #f8f9fa;
@@ -20,34 +21,49 @@
   }
 </style>
 
-
-{% block content %}
 <div class="container mt-4">
   <div class="card shadow-sm">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-      <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i> Nova Audiência-Conciliação-Reunião Estratégica-Sessão de Julgamento</h5>
+      <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i> Nova Audiência / Compromisso</h5>
       <a href="{% url 'agenda:lista_audiencias' %}" class="btn btn-sm btn-light">
         <i class="fas fa-arrow-left me-1"></i> Voltar para lista
       </a>
     </div>
-    
+
     <div class="card-body">
+      {% if form.errors %}
+      <div class="alert alert-danger">
+          <h6><i class="fas fa-exclamation-triangle me-2"></i>Erros no formulário:</h6>
+          <ul class="mb-0">
+              {% for field in form %}
+                  {% for error in field.errors %}
+                      <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                  {% endfor %}
+              {% endfor %}
+              {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      </div>
+      {% endif %}
+
       <form method="post" novalidate>
         {% csrf_token %}
-        {{ form.non_field_errors }}
 
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Data e Hora</label>
+            <label class="form-label"><i class="fas fa-calendar-alt me-1"></i> Data e Hora *</label>
             {{ form.data_hora|add_class:"form-control" }}
             {% for error in form.data_hora.errors %}
               <div class="text-danger small">{{ error }}</div>
             {% endfor %}
+            <!-- FEEDBACK DE HORÁRIO -->
+            <div id="horario-feedback" class="mt-1"></div>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo</label>
-            {{ form.tipo|add_class:"form-select" }}
+            <label class="form-label"><i class="fas fa-tag me-1"></i> Tipo *</label>
+            {{ form.tipo|add_class:"form-select tipo-select" }}
             {% for error in form.tipo.errors %}
               <div class="text-danger small">{{ error }}</div>
             {% endfor %}
@@ -56,7 +72,7 @@
 
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Local</label>
+            <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Local *</label>
             {{ form.local|add_class:"form-control" }}
             {% for error in form.local.errors %}
               <div class="text-danger small">{{ error }}</div>
@@ -64,82 +80,160 @@
           </div>
 
           <div class="col-md-6">
-              <label class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Vara</label>
-              {{ form.vara|add_class:"form-control" }}
-              {% for error in form.local.errors %}
-                <div class="text-danger small">{{ error }}</div>
-              {% endfor %}
+            <label class="form-label"><i class="fas fa-university me-1"></i> Vara / Fórum</label>
+            {{ form.vara|add_class:"form-control" }}
+            {% for error in form.vara.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
           </div>
+        </div>
 
+        <div class="row mb-3">
           <div class="col-md-6">
             <label class="form-label"><i class="fas fa-folder-open me-1"></i> Processo</label>
             {{ form.processo|add_class:"form-select" }}
             {% for error in form.processo.errors %}
               <div class="text-danger small">{{ error }}</div>
             {% endfor %}
+            <div class="form-text">Opcional se cliente estiver preenchido</div>
           </div>
+          
           <div class="col-md-6">
             <label class="form-label"><i class="fas fa-user me-1"></i> Cliente</label>
             {{ form.cliente|add_class:"form-select" }}
             {% for error in form.cliente.errors %}
               <div class="text-danger small">{{ error }}</div>
             {% endfor %}
+            <div class="form-text">Opcional se processo estiver preenchido</div>
           </div>
         </div>
 
+        <div class="row mb-3">
+          <div class="col-12">
+            <label class="form-label"><i class="fas fa-sticky-note me-1"></i> Resultado / Observações</label>
+            {{ form.resultado|add_class:"form-control"|attr:"rows:3" }}
+            {% for error in form.resultado.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- VALIDAÇÃO DE BLOQUEIO EM TEMPO REAL -->
+        <div id="bloqueio-alert" class="alert alert-warning d-none">
+          <i class="fas fa-ban me-2"></i>
+          <span id="bloqueio-mensagem"></span>
+        </div>
+
         <div class="text-end mt-4">
-          <button type="submit" class="btn btn-success px-4">
-            <i class="fas fa-save me-1"></i> Salvar Evento
+          <button type="submit" class="btn btn-success px-4" id="submit-btn">
+            <i class="fas fa-save me-1"></i> Salvar Compromisso
           </button>
         </div>
       </form>
     </div>
   </div>
 </div>
-{% block extra_js %}
-    <!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
 
+{% block extra_js %}
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    flatpickr('input[name="data_hora"]', {
+document.addEventListener('DOMContentLoaded', function() {
+  // Configuração do Flatpickr
+  const dataHoraInput = document.getElementById('id_data_hora');
+  if (dataHoraInput) {
+    flatpickr(dataHoraInput, {
       enableTime: true,
-      dateFormat: "d/m/Y H:i",
+      dateFormat: "Y-m-d H:i",
       time_24hr: true,
-      locale: "pt"
+      locale: "pt",
+      minDate: "today",
+      disable: [
+        function(date) {
+          // Desabilita fins de semana
+          return (date.getDay() === 0 || date.getDay() === 6);
+        }
+      ]
     });
-  });
+  }
 
   // Lógica para desabilitar um campo quando o outro é preenchido
-  document.addEventListener('DOMContentLoaded', function () {
-    const processoSelect = document.querySelector('select[name="processo"]');
-    const clienteSelect = document.querySelector('select[name="cliente"]');
+  const processoSelect = document.getElementById('id_processo');
+  const clienteSelect = document.getElementById('id_cliente');
 
-    processoSelect.addEventListener('change', function () {
-      // Se um processo for selecionado, desabilita e limpa o campo cliente
+  if (processoSelect && clienteSelect) {
+    processoSelect.addEventListener('change', function() {
       if (processoSelect.value) {
-        clienteSelect.value = ''; // Limpa a seleção
+        clienteSelect.value = '';
         clienteSelect.disabled = true;
       } else {
         clienteSelect.disabled = false;
       }
     });
 
-    clienteSelect.addEventListener('change', function () {
-      // Se um cliente for selecionado, desabilita e limpa o campo processo
+    clienteSelect.addEventListener('change', function() {
       if (clienteSelect.value) {
-        processoSelect.value = ''; // Limpa a seleção
+        processoSelect.value = '';
         processoSelect.disabled = true;
       } else {
         processoSelect.disabled = false;
       }
     });
-  });
+  }
+
+  // Validação de horário em tempo real
+  const dataHoraField = document.getElementById('id_data_hora');
+  const bloqueioAlert = document.getElementById('bloqueio-alert');
+  const bloqueioMensagem = document.getElementById('bloqueio-mensagem');
+  const submitBtn = document.getElementById('submit-btn');
+  const horarioFeedback = document.getElementById('horario-feedback');
+
+  function verificarHorario(dataHora) {
+    if (!dataHora) return;
+    
+    const data = new Date(dataHora);
+    const hora = data.getHours();
+    const minutos = data.getMinutes();
+    const diaSemana = data.getDay();
+    
+    // Mostra loading
+    if (horarioFeedback) {
+      horarioFeedback.innerHTML = '<div class="text-warning"><i class="fas fa-spinner fa-spin"></i> Verificando disponibilidade...</div>';
+    }
+    
+    // Simula verificação (implemente chamada AJAX real)
+    setTimeout(() => {
+      // Validação básica de horário comercial
+      if (hora < 9 || hora >= 18) {
+        if (horarioFeedback) {
+          horarioFeedback.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> Horário fora do expediente comercial (09:00-18:00)</div>';
+        }
+        if (submitBtn) submitBtn.disabled = true;
+      } else if (diaSemana === 0 || diaSemana === 6) {
+        if (horarioFeedback) {
+          horarioFeedback.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> Fim de semana não disponível</div>';
+        }
+        if (submitBtn) submitBtn.disabled = true;
+      } else {
+        if (horarioFeedback) {
+          horarioFeedback.innerHTML = '<div class="text-success"><i class="fas fa-check"></i> Horário dentro do expediente</div>';
+        }
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }, 500);
+  }
+
+  if (dataHoraField) {
+    dataHoraField.addEventListener('change', function() {
+      const dataHora = this.value;
+      verificarHorario(dataHora);
+    });
+  }
+});
 </script>
-
-
-    {% endblock %}
 {% endblock %}

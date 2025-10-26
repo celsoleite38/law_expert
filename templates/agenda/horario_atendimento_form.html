@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        {% if object %}
+                            ✏️ Editar Horário de Atendimento
+                        {% else %}
+                            🕐 Novo Horário de Atendimento
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <!-- Dia da Semana -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.dia_semana.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-day me-1"></i>Dia da Semana *
+                                </label>
+                                {{ form.dia_semana }}
+                                {% if form.dia_semana.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.dia_semana.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch mt-2">
+                                    {{ form.ativo }}
+                                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                        Horário Ativo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Hora Início -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.hora_inicio.id_for_label }}" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>Hora de Início *
+                                </label>
+                                {{ form.hora_inicio }}
+                                {% if form.hora_inicio.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.hora_inicio.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Hora Fim -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.hora_fim.id_for_label }}" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>Hora de Término *
+                                </label>
+                                {{ form.hora_fim }}
+                                {% if form.hora_fim.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.hora_fim.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Duração do Slot -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.duracao_slot.id_for_label }}" class="form-label">
+                                    <i class="fas fa-hourglass-half me-1"></i>Duração do Slot (minutos) *
+                                </label>
+                                {{ form.duracao_slot }}
+                                <div class="form-text">
+                                    Duração de cada horário de atendimento (15, 30, 45, 60 minutos)
+                                </div>
+                                {% if form.duracao_slot.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.duracao_slot.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Máximo de Compromissos -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.max_compromissos.id_for_label }}" class="form-label">
+                                    <i class="fas fa-users me-1"></i>Máx. Compromissos por Slot *
+                                </label>
+                                {{ form.max_compromissos }}
+                                <div class="form-text">
+                                    Número máximo de compromissos no mesmo horário
+                                </div>
+                                {% if form.max_compromissos.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.max_compromissos.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Informações de Resumo -->
+                        <div class="alert alert-info mt-4">
+                            <h6><i class="fas fa-info-circle me-2"></i>Resumo do Horário</h6>
+                            <div id="resumo-horario">
+                                <small class="text-muted">Preencha os campos acima para ver o resumo</small>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'agenda:lista_horarios' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar para Lista
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-1"></i>
+                                    {% if object %}Atualizar{% else %}Salvar{% endif %} Horário
+                                </button>
+                                {% if object %}
+                                    <a href="{% url 'agenda:deletar_horario' object.pk %}" class="btn btn-danger ms-2">
+                                        <i class="fas fa-trash me-1"></i> Excluir
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualiza o resumo em tempo real
+    function atualizarResumo() {
+        const diaSemana = document.getElementById('id_dia_semana');
+        const horaInicio = document.getElementById('id_hora_inicio');
+        const horaFim = document.getElementById('id_hora_fim');
+        const duracaoSlot = document.getElementById('id_duracao_slot');
+        const maxCompromissos = document.getElementById('id_max_compromissos');
+        
+        const resumo = document.getElementById('resumo-horario');
+        
+        if (diaSemana.value && horaInicio.value && horaFim.value && duracaoSlot.value) {
+            const diaTexto = diaSemana.options[diaSemana.selectedIndex].text;
+            const duracao = parseInt(duracaoSlot.value);
+            const max = maxCompromissos.value || 1;
+            
+            // Calcula número de slots
+            const inicio = new Date('1970-01-01T' + horaInicio.value + 'Z');
+            const fim = new Date('1970-01-01T' + horaFim.value + 'Z');
+            const diffMinutos = (fim - inicio) / (1000 * 60);
+            const numSlots = Math.floor(diffMinutos / duracao);
+            
+            resumo.innerHTML = `
+                <strong>${diaTexto}</strong>: ${horaInicio.value} às ${horaFim.value}<br>
+                <strong>Duração por atendimento</strong>: ${duracao} minutos<br>
+                <strong>Slots disponíveis</strong>: ${numSlots} horários<br>
+                <strong>Máximo por slot</strong>: ${max} compromisso(s)<br>
+                <strong>Capacidade total</strong>: ${numSlots * max} atendimentos possíveis
+            `;
+        } else {
+            resumo.innerHTML = '<small class="text-muted">Preencha os campos acima para ver o resumo</small>';
+        }
+    }
+    
+    // Adiciona listeners para os campos
+    const campos = ['id_dia_semana', 'id_hora_inicio', 'id_hora_fim', 'id_duracao_slot', 'id_max_compromissos'];
+    campos.forEach(campo => {
+        const element = document.getElementById(campo);
+        if (element) {
+            element.addEventListener('change', atualizarResumo);
+            element.addEventListener('input', atualizarResumo);
+        }
+    });
+    
+    // Atualiza inicialmente
+    atualizarResumo();
+    
+    // Validação de horários
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const horaInicio = document.getElementById('id_hora_inicio').value;
+        const horaFim = document.getElementById('id_hora_fim').value;
+        
+        if (horaInicio && horaFim && horaFim <= horaInicio) {
+            e.preventDefault();
+            alert('❌ Hora de término deve ser posterior à hora de início!');
+            return false;
+        }
+    });
+});
+</script>
+
+<style>
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-select, .form-control {
+    border-radius: 0.5rem;
+}
+
+.form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.alert-info {
+    border-left: 4px solid #0dcaf0;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 1rem;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #4a6fa5 100%);
+    color: white;
+    border-radius: 1rem 1rem 0 0 !important;
+    padding: 1.5rem;
+}
+</style>
+{% endblock %}
